@@ -1,0 +1,105 @@
+# ==================== Node / NPM ====================
+  node_modules/
+  npm-debug.log*
+  yarn-debug.log*
+  yarn-error.log*
+  pnpm-debug.log*
+  package-lock.json
+  yarn.lock
+  .pnpm-store/
+  dist/
+  dist-ssr/
+  *.local
+
+  # ==================== Rust / Tauri ====================
+  /target/
+  Cargo.lock
+  **/*.rs.bk
+  *.pdb
+  *.dll
+  *.dylib
+  *.so
+  # Tauri specific
+  src-tauri/target/
+  src-tauri/Cargo.lock
+
+  # ==================== Flutter / Dart ====================
+  **/dart_tool/
+  **/android/**/gradle-wrapper.jar
+  **/android/.gradle/
+  **/android/captures/
+  **/android/gradlew
+  **/android/gradlew.bat
+  **/android/local.properties
+  **/ios/.generated/
+  **/ios/Pods/
+  **/ios/.symlinks/
+  **/ios/Flutter/.last_build_id
+  **/ios/Flutter/Flutter.framework
+  **/ios/Flutter/Flutter.podspec
+  .buildlog/
+  flutter_sdk/
+  .flutter-plugins
+  .flutter-plugins-dependencies
+  .packages
+  .pub-cache/
+  .pub/
+  pubspec.lock
+
+  # ==================== 编辑器 / IDE ====================
+  .vscode/*
+  !.vscode/extensions.json
+  !.vscode/settings.json
+  .idea/
+  *.swp
+  *.swo
+  *~
+  .DS_Store
+  Thumbs.db
+  *.sublime-project
+  *.sublime-workspace
+
+  # ==================== 系统文件 ====================
+  .DS_Store
+  .DS_Store?
+  ._*
+  .Spotlight-V100
+  .Trashes
+  ehthumbs.db
+  Thumbs.db
+  Desktop.ini
+
+  # ==================== 环境变量 / 密钥 ====================
+  .env
+  .env.local
+  .env.*.local
+  *.pem
+  *.key
+  credentials.json
+  *.env
+
+  # ==================== 构建产物 ====================
+  /build/
+  /out/
+  *.tgz
+  *.tar.gz
+  *.app
+  *.dmg
+  *.exe
+  *.msi
+
+  # ==================== 日志 / 临时文件 ====================
+  *.log
+  logs/
+  *.tmp
+  *.cache
+  .cache/
+
+  # ==================== 测试覆盖率 ====================
+  coverage/
+  *.lcov
+  .nyc_output/
+
+  # ==================== 其他 ====================
+  .prettierignore
+  .eslintcache
