@@ -1,0 +1,19 @@
+{
+  "name": "@mindflow/renderer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MindFlow Markdown renderer",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
+  },
+  "dependencies": {
+    "@mindflow/types": "file:../../shared/types",
+    "@mindflow/parser": "file:../parser"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

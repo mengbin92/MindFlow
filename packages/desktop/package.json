@@ -1,0 +1,32 @@
+{
+  "name": "@mindflow/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MindFlow Desktop App (Tauri)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
+  },
+  "dependencies": {
+    "@mindflow/types": "file:../../shared/types",
+    "@mindflow/constants": "file:../../shared/constants",
+    "@mindflow/utils": "file:../../shared/utils",
+    "@tauri-apps/api": "^1.5.3",
+    "@tauri-apps/plugin-shell": "^1.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.10",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11"
+  }
+}

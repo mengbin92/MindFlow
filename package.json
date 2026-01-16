@@ -1,0 +1,38 @@
+{
+  "name": "mindflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A minimalist Markdown editor with multi-platform support",
+  "packageManager": "npm@10.2.4",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "desktop:dev": "cd packages/desktop && npm run dev",
+    "desktop:build": "cd packages/desktop && npm run build",
+    "web:dev": "cd packages/web && npm run dev",
+    "web:build": "cd packages/web && npm run build"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "turbo": "^2.0.0",
+    "prettier": "^3.2.0",
+    "eslint": "^8.57.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "markdown",
+    "editor",
+    "tauri",
+    "desktop",
+    "web",
+    "mobile"
+  ],
+  "author": "MindFlow Team",
+  "license": "MIT"
+}
