@@ -89,6 +89,75 @@ export interface Folder {
 
   /** 子项列表，可以是文件夹或文件 */
   children: (Folder | MarkdownFile)[];
+
+  /** 是否折叠 */
+  isCollapsed?: boolean;
+
+  /** 最后修改时间 */
+  modifiedAt: Date;
+}
+
+/**
+ * 文件树节点接口
+ * @description 表示文件树中的一个节点
+ */
+export interface FileTreeNode {
+  /** 节点唯一标识符 */
+  id: string;
+
+  /** 节点名称 */
+  name: string;
+
+  /** 节点路径 */
+  path: string;
+
+  /** 是否为文件夹 */
+  isDir: boolean;
+
+  /** 子节点 */
+  children?: FileTreeNode[];
+
+  /** 文件大小（字节） */
+  size?: number;
+
+  /** 最后修改时间 */
+  modifiedTime: number;
+
+  /** 文件内容（仅文件） */
+  content?: string;
+
+  /** 是否折叠（仅文件夹） */
+  isCollapsed?: boolean;
+}
+
+/**
+ * 文件操作状态接口
+ * @description 文件操作的异步状态
+ */
+export interface FileOperationState {
+  /** 是否正在加载 */
+  isLoading: boolean;
+
+  /** 错误信息 */
+  error: string | null;
+
+  /** 最后操作时间 */
+  lastOperation: Date | null;
+}
+
+/**
+ * 文件搜索结果接口
+ * @description 文件搜索的返回结果
+ */
+export interface SearchResult {
+  /** 匹配的文件列表 */
+  files: FileTreeNode[];
+
+  /** 搜索关键字 */
+  query: string;
+
+  /** 搜索结果数量 */
+  count: number;
 }
 
 // ==================== 配置相关类型 ====================

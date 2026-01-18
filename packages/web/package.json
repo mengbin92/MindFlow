@@ -12,12 +12,14 @@
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
   },
   "dependencies": {
-    "@mindflow/types": "file:../../shared/types",
     "@mindflow/constants": "file:../../shared/constants",
-    "@mindflow/utils": "file:../../shared/utils",
     "@mindflow/core": "file:../core",
+    "@mindflow/types": "file:../../shared/types",
+    "@mindflow/utils": "file:../../shared/utils",
+    "@reduxjs/toolkit": "^2.11.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^6.21.1"
   },
   "devDependencies": {

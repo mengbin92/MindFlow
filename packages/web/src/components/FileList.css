@@ -1,0 +1,147 @@
+/**
+ * FileList 组件样式
+ */
+
+.file-list {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  background-color: var(--bg-secondary, #f5f5f5);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.file-list-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-list-empty-message {
+  padding: 20px;
+  text-align: center;
+  color: var(--color-secondary, #666);
+  font-size: 14px;
+}
+
+/* 文件标签 */
+.file-tab {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-right: 1px solid var(--border-color, #e0e0e0);
+  background-color: var(--bg-secondary, #f5f5f5);
+  transition: background-color 0.15s ease;
+  min-width: 120px;
+  max-width: 200px;
+}
+
+.file-tab:hover {
+  background-color: var(--bg-hover, #e8e8e8);
+}
+
+.file-tab.active {
+  background-color: var(--bg-primary, #ffffff);
+  border-bottom: 2px solid var(--accent-color, #213547);
+  font-weight: 500;
+}
+
+/* 文件标签图标 */
+.file-tab-icon {
+  margin-right: 6px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* 文件标签名称 */
+.file-tab-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--color-primary, #213547);
+}
+
+/* 关闭按钮 */
+.file-tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-secondary, #666);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  opacity: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.file-tab:hover .file-tab-close {
+  opacity: 1;
+}
+
+.file-tab-close:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: var(--color-primary, #213547);
+}
+
+/* 滚动条样式 */
+.file-list::-webkit-scrollbar {
+  height: 4px;
+}
+
+.file-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.file-list::-webkit-scrollbar-thumb {
+  background: var(--color-secondary, rgba(0, 0, 0, 0.2));
+  border-radius: 2px;
+}
+
+.file-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary, rgba(0, 0, 0, 0.3));
+}
+
+/* 深色主题 */
+.theme-dark .file-list {
+  background-color: var(--bg-secondary, #252526);
+  border-bottom: 1px solid var(--border-color, #3e3e42);
+}
+
+.theme-dark .file-tab {
+  background-color: var(--bg-secondary, #252526);
+  border-right: 1px solid var(--border-color, #3e3e42);
+}
+
+.theme-dark .file-tab:hover {
+  background-color: var(--bg-hover, #2d2d30);
+}
+
+.theme-dark .file-tab.active {
+  background-color: var(--bg-primary, #1e1e1e);
+  border-bottom: 2px solid var(--accent-color, #007acc);
+}
+
+.theme-dark .file-tab-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-primary, #d4d4d4);
+}
+
+.theme-dark .file-list::-webkit-scrollbar-thumb {
+  background: var(--color-secondary, rgba(255, 255, 255, 0.2));
+}
+
+.theme-dark .file-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary, rgba(255, 255, 255, 0.3));
+}

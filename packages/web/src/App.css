@@ -1,5 +1,5 @@
 /**
- * App 组件样式 - 三栏布局（桌面端）
+ * App 组件样式 - 三栏布局
  */
 
 /* 全局样式 */
@@ -7,22 +7,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  height: 100vh;
-  overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-}
-
-#root {
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
 }
 
 /* CSS 变量定义 */
@@ -65,6 +49,9 @@ body {
   overflow: hidden;
   background-color: var(--bg-primary);
   color: var(--color-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
 }
 
 /* ==================== 侧边栏 ==================== */
@@ -145,46 +132,7 @@ body {
 /* 编辑器容器 */
 .editor-container {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
-}
-
-/* 编辑器占位符 */
-.editor-placeholder {
-  text-align: center;
-  color: var(--color-secondary);
-}
-
-.editor-placeholder h2 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--color-primary);
-}
-
-.editor-placeholder p {
-  font-size: 1rem;
-  color: var(--color-secondary);
-}
-
-/* ==================== 滚动条样式 ==================== */
-
-.sidebar-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-  background: var(--color-secondary, rgba(0, 0, 0, 0.2));
-  border-radius: 4px;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb:hover {
-  background: var(--color-secondary, rgba(0, 0, 0, 0.3));
 }
 
 /* ==================== 响应式设计 ==================== */
@@ -208,4 +156,23 @@ body {
   .main-content {
     width: 100%;
   }
+}
+
+/* ==================== 滚动条样式 ==================== */
+
+.sidebar-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--color-secondary, rgba(0, 0, 0, 0.2));
+  border-radius: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary, rgba(0, 0, 0, 0.3));
 }
