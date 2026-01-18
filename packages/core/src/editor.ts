@@ -12,6 +12,7 @@ import { markdown } from '@codemirror/lang-markdown';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { keymap } from '@codemirror/view';
 import { defaultKeymap } from '@codemirror/commands';
+import { shortcutManager } from './shortcuts';
 
 /**
  * 编辑器配置接口
@@ -29,6 +30,9 @@ export interface EditorConfig {
 
   /** 是否为只读模式，默认为 false（可编辑） */
   readonly?: boolean;
+
+  /** 是否启用默认快捷键，默认为 true */
+  enableShortcuts?: boolean;
 }
 
 /**
@@ -92,14 +96,25 @@ export function createEditor(config: EditorConfig): EditorController {
   // 创建只读模式隔离层，用于动态切换编辑状态
   const readonlyCompartment = new Compartment();
 
-  // 配置编辑器扩展
+  // 构建编辑器扩展
   const extensions = [
     basicSetup, // 基础功能（行号、撤销重做等）
     markdown(), // Markdown 语法支持
     keymap.of(defaultKeymap), // 默认快捷键
+  ];
+
+  // 如果启用快捷键（默认），添加自定义快捷键
+  if (config.enableShortcuts !== false) {
+    // 注册默认快捷键（如果尚未注册）
+    registerDefaultShortcuts();
+    extensions.push(keymap.of(shortcutManager.toKeymap()));
+  }
+
+  // 添加主题和只读配置
+  extensions.push(
     themeCompartment.of(config.theme === 'dark' ? oneDark : []), // 主题配置
     readonlyCompartment.of(EditorView.editable.of(!config.readonly)), // 可编辑性
-  ];
+  );
 
   // 创建编辑器状态
   const state = EditorState.create({
@@ -139,4 +154,35 @@ export function createEditor(config: EditorConfig): EditorController {
     },
     destroy: () => view.destroy(),
   };
+}
+
+/**
+ * 注册默认快捷键
+ * @description 仅在未注册时注册常用 Markdown 快捷键
+ */
+function registerDefaultShortcuts(): void {
+  // 检查是否已注册，如果没有则注册
+  if (!shortcutManager.getAll().length) {
+    // 导入快捷键处理器
+    const { ShortcutHandlers, DefaultShortcuts } = require('./shortcuts');
+
+    // 注册常用 Markdown 快捷键
+    shortcutManager.register({
+      key: DefaultShortcuts.Bold,
+      description: '粗体',
+      handler: ShortcutHandlers.bold,
+    });
+
+    shortcutManager.register({
+      key: DefaultShortcuts.Italic,
+      description: '斜体',
+      handler: ShortcutHandlers.italic,
+    });
+
+    shortcutManager.register({
+      key: DefaultShortcuts.Code,
+      description: '内联代码',
+      handler: ShortcutHandlers.code,
+    });
+  }
 }

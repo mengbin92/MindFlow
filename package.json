@@ -4,6 +4,10 @@
   "private": true,
   "description": "A minimalist Markdown editor with multi-platform support",
   "packageManager": "npm@10.2.4",
+  "workspaces": [
+    "packages/*",
+    "shared/*"
+  ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -13,7 +17,8 @@
     "desktop:dev": "cd packages/desktop && npm run dev",
     "desktop:build": "cd packages/desktop && npm run build",
     "web:dev": "cd packages/web && npm run dev",
-    "web:build": "cd packages/web && npm run build"
+    "web:build": "cd packages/web && npm run build",
+    "install:all": "npm install"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",

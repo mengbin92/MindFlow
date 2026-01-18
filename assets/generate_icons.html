@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512"></canvas>
+    <script>
+        const svg = `
+        <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="256" cy="256" r="248" fill="#3B82F6" opacity="0.1"/>
+            <g transform="translate(106, 106)">
+                <rect x="0" y="40" width="300" height="220" rx="24" fill="#3B82F6"/>
+                <path d="M300 40 L300 100 L240 40 Z" fill="#60A5FA" opacity="0.8"/>
+                <rect x="30" y="80" width="240" height="12" rx="6" fill="white" opacity="0.9"/>
+                <rect x="30" y="110" width="210" height="12" rx="6" fill="white" opacity="0.8"/>
+                <rect x="30" y="140" width="220" height="12" rx="6" fill="white" opacity="0.8"/>
+                <rect x="30" y="170" width="180" height="12" rx="6" fill="white" opacity="0.8"/>
+                <rect x="30" y="200" width="200" height="12" rx="6" fill="white" opacity="0.8"/>
+                <rect x="30" y="230" width="160" height="12" rx="6" fill="white" opacity="0.8"/>
+                <g transform="translate(180, 90)">
+                    <path d="M0 20 Q 40 20 40 40 T 80 60" stroke="#FCD34D" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.9"/>
+                    <polygon points="85,60 75,55 75,65" fill="#FCD34D"/>
+                </g>
+                <g transform="translate(220, 60)" opacity="0.3">
+                    <rect x="0" y="0" width="12" height="60" rx="6" fill="white"/>
+                    <rect x="20" y="0" width="12" height="60" rx="6" fill="white"/>
+                    <rect x="40" y="0" width="12" height="60" rx="6" fill="white"/>
+                </g>
+            </g>
+            <circle cx="256" cy="256" r="248" fill="none" stroke="#3B82F6" stroke-width="4" opacity="0.2"/>
+        </svg>
+        `;
+        
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            
+            // Generate different sizes
+            const sizes = [16, 32, 48, 64, 128, 256, 512, 1024];
+            sizes.forEach(size => {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = size;
+                tempCanvas.height = size;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.imageSmoothingEnabled = true;
+                tempCtx.imageSmoothingQuality = 'high';
+                tempCtx.drawImage(img, 0, 0, size, size);
+                
+                tempCanvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `icon-${size}x${size}.png`;
+                    a.click();
+                });
+            });
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(svg);
+    </script>
+</body>
+</html>

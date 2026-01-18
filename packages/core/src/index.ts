@@ -31,3 +31,15 @@ export type { Theme } from './themes';
  * @description 提供插件注册和管理功能
  */
 export * from './plugins';
+
+/**
+ * 导出快捷键系统
+ * @description 提供快捷键注册、绑定和管理功能
+ */
+export * from './shortcuts';
+
+/**
+ * 导出自动保存系统
+ * @description 提供自动保存、延迟保存和本地存储功能
+ */
+export * from './auto-save';

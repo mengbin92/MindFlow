@@ -15,6 +15,7 @@
     "@mindflow/types": "file:../../shared/types",
     "@mindflow/constants": "file:../../shared/constants",
     "@mindflow/utils": "file:../../shared/utils",
+    "@mindflow/core": "file:../core",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.1"
