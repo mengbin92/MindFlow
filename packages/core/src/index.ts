@@ -11,7 +11,7 @@
  * @description 提供创建和管理 CodeMirror 编辑器的能力
  */
 export { createEditor } from './editor';
-export type { EditorConfig } from './editor';
+export type { EditorConfig, EditorController } from './editor';
 
 /**
  * 导出 Markdown 解析器
@@ -43,3 +43,13 @@ export * from './shortcuts';
  * @description 提供自动保存、延迟保存和本地存储功能
  */
 export * from './auto-save';
+
+/**
+ * 导出扩展语法处理器
+ * @description 支持 LaTeX、Mermaid、Markmap、PlantUML 等扩展语法
+ */
+export {
+  ExtendedSyntaxProcessor,
+  extendedSyntaxProcessor,
+  ExtendedSyntaxType,
+} from './extended-syntax';

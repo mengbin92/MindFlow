@@ -3,7 +3,7 @@
  * @description 显示文件和文件夹的层次结构
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { FileTreeNode } from '@mindflow/types';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
@@ -28,7 +28,7 @@ const FileTreeNodeComponent: React.FC<FileTreeNodeProps> = ({ node, level, path 
   const selectedFile = useAppSelector(state => state.fileSystem.selectedFile);
   const nodePath = path ? `${path}/${node.name}` : node.name;
 
-  const isExpanded = expandedFolders.has(nodePath);
+  const isExpanded = expandedFolders.includes(nodePath);
   const isSelected = selectedFile === nodePath;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -125,30 +125,24 @@ export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
   const fileTree = useAppSelector(state => state.fileSystem.fileTree);
   const isLoading = useAppSelector(state => state.fileSystem.operationState.isLoading);
 
-  // 组件加载时获取文件树
-  useEffect(() => {
-    if (!fileTree) {
-      dispatch(getFileTree(''));
-    }
-  }, [dispatch, fileTree]);
+  // 处理打开目录
+  const handleOpenDirectory = () => {
+    dispatch(getFileTree(''));
+  };
 
-  // 加载状态
-  if (isLoading && !fileTree) {
-    return (
-      <div className={`file-tree file-tree-loading ${className}`}>
-        <div className="file-tree-loading-message">
-          Loading file tree...
-        </div>
-      </div>
-    );
-  }
-
-  // 空状态
+  // 空状态 - 显示打开目录按钮
   if (!fileTree) {
     return (
       <div className={`file-tree file-tree-empty ${className}`}>
         <div className="file-tree-empty-message">
-          No directory selected
+          <p>No directory selected</p>
+          <button
+            className="open-directory-button"
+            onClick={handleOpenDirectory}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Opening...' : '📂 Open Directory'}
+          </button>
         </div>
       </div>
     );

@@ -8,16 +8,20 @@
 
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { FileTree } from './components/FileTree';
 import { FileList } from './components/FileList';
 import { SearchBar } from './components/SearchBar';
+import { Toolbar } from './components/Toolbar';
 import { store } from './store';
+import { getFileTree } from './store/fileSystemSlice';
 import './styles.css';
 
 /**
  * 主应用内容组件
  */
 function AppContent(): JSX.Element {
+  const dispatch = useDispatch();
   // 当前主题状态
   const [currentTheme, setCurrentTheme] = React.useState<'light' | 'dark'>('light');
 
@@ -28,7 +32,20 @@ function AppContent(): JSX.Element {
       setCurrentTheme(savedTheme);
       document.documentElement.classList.add(`theme-${savedTheme}`);
     }
-  }, []);
+
+    // 初始化工作目录
+    const initWorkspace = async () => {
+      try {
+        // 默认使用用户主目录下的 MindFlow 文件夹
+        // 路径将在 Rust 端解析，使用 ~ 作为主目录的快捷方式
+        dispatch(getFileTree('~/MindFlow') as any);
+      } catch (error) {
+        console.error('Failed to initialize workspace:', error);
+      }
+    };
+
+    initWorkspace();
+  }, [dispatch]);
 
   /**
    * 处理主题变化
@@ -63,6 +80,9 @@ function AppContent(): JSX.Element {
             {currentTheme === 'light' ? '🌙' : '☀️'}
           </button>
         </div>
+
+        {/* 工具栏 */}
+        <Toolbar className="sidebar-toolbar" />
 
         {/* 搜索栏 */}
         <SearchBar className="sidebar-search" />

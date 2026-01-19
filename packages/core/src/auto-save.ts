@@ -46,7 +46,7 @@ export class AutoSaveManager {
   private currentState: SaveState = SaveState.Saved;
 
   /** 保存延迟定时器 */
-  private saveTimer: NodeJS.Timeout | null = null;
+  private saveTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** 自动保存延迟时间（毫秒） */
   private delay: number;

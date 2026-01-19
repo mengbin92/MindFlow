@@ -11,8 +11,6 @@ import {
   createEditor,
   EditorController,
   parser,
-  themeManager,
-  shortcutManager,
   DefaultShortcuts,
   LocalStorageAutoSaveManager,
   SaveState,
@@ -96,11 +94,18 @@ const Editor: React.FC<EditorProps> = ({
    * 更新预览内容
    * @param newContent - 新的编辑器内容
    */
-  const updatePreview = (newContent: string) => {
+  const updatePreview = async (newContent: string) => {
     if (previewRef.current) {
       // 使用 parser 解析 Markdown
       const html = parser.parse(newContent);
       previewRef.current.innerHTML = html;
+
+      // 渲染需要延迟处理的扩展语法（Mermaid、Markmap）
+      try {
+        await parser.renderExtendedSyntax(previewRef.current);
+      } catch (error) {
+        console.error('Extended syntax rendering error:', error);
+      }
     }
 
     // 调用外部回调

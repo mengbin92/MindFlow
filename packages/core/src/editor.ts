@@ -7,12 +7,15 @@
  */
 
 import { EditorState, Compartment } from '@codemirror/state';
-import { EditorView, basicSetup } from '@codemirror/view';
+import { EditorView, keymap, drawSelection, dropCursor } from '@codemirror/view';
 import { markdown } from '@codemirror/lang-markdown';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { keymap } from '@codemirror/view';
-import { defaultKeymap } from '@codemirror/commands';
-import { shortcutManager } from './shortcuts';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
+import { autocompletion } from '@codemirror/autocomplete';
+import { bracketMatching } from '@codemirror/language';
+import { highlightSpecialChars } from '@codemirror/view';
+import { shortcutManager, ShortcutHandlers, DefaultShortcuts } from './shortcuts';
 
 /**
  * 编辑器配置接口
@@ -39,7 +42,7 @@ export interface EditorConfig {
  * 编辑器控制器接口
  * @description 编辑器实例返回的控制器，用于操作编辑器
  */
-interface EditorController {
+export interface EditorController {
   /** CodeMirror 的 EditorView 实例 */
   view: EditorView;
 
@@ -98,9 +101,20 @@ export function createEditor(config: EditorConfig): EditorController {
 
   // 构建编辑器扩展
   const extensions = [
-    basicSetup, // 基础功能（行号、撤销重做等）
-    markdown(), // Markdown 语法支持
-    keymap.of(defaultKeymap), // 默认快捷键
+    // 基础功能
+    history(),
+    drawSelection(),
+    dropCursor(),
+    highlightSpecialChars(),
+    highlightSelectionMatches(),
+    bracketMatching(),
+    autocompletion(),
+
+    // Markdown 语法支持
+    markdown(),
+
+    // 快捷键
+    keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
   ];
 
   // 如果启用快捷键（默认），添加自定义快捷键
@@ -163,9 +177,6 @@ export function createEditor(config: EditorConfig): EditorController {
 function registerDefaultShortcuts(): void {
   // 检查是否已注册，如果没有则注册
   if (!shortcutManager.getAll().length) {
-    // 导入快捷键处理器
-    const { ShortcutHandlers, DefaultShortcuts } = require('./shortcuts');
-
     // 注册常用 Markdown 快捷键
     shortcutManager.register({
       key: DefaultShortcuts.Bold,

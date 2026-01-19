@@ -11,6 +11,9 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles.css';
 
+// 导入 KaTeX 样式
+import 'katex/dist/katex.css';
+
 /**
  * 渲染 Web 端应用
  * @description 创建 React 根节点并渲染 App 组件

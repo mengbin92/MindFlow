@@ -17,7 +17,7 @@ interface FileSystemState {
   fileTree: FileTreeNode | null;
 
   /** 展开的文件夹路径列表 */
-  expandedFolders: Set<string>;
+  expandedFolders: string[];
 
   /** 选中的文件路径 */
   selectedFile: string | null;
@@ -46,7 +46,7 @@ interface FileSystemState {
 const initialState: FileSystemState = {
   currentDirectory: '',
   fileTree: null,
-  expandedFolders: new Set(),
+  expandedFolders: [],
   selectedFile: null,
   openFiles: [],
   currentFile: null,
@@ -197,10 +197,11 @@ const fileSystemSlice = createSlice({
     /** 切换文件夹展开状态 */
     toggleFolder: (state, action: PayloadAction<string>) => {
       const path = action.payload;
-      if (state.expandedFolders.has(path)) {
-        state.expandedFolders.delete(path);
+      const index = state.expandedFolders.indexOf(path);
+      if (index !== -1) {
+        state.expandedFolders.splice(index, 1);
       } else {
-        state.expandedFolders.add(path);
+        state.expandedFolders.push(path);
       }
     },
 
@@ -265,7 +266,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(readFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
 
         // 更新文件内容
         const { path, content } = action.payload;
@@ -287,7 +288,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(writeFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
 
         // 更新文件内容
         const { path, content } = action.payload;
@@ -309,7 +310,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(getFileTree.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
         state.currentDirectory = action.payload.path;
         state.fileTree = action.payload.fileTree;
       })

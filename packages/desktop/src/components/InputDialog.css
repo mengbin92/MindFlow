@@ -1,0 +1,154 @@
+/**
+ * @fileoverview 输入对话框样式
+ * @description 输入对话框组件的样式定义
+ */
+
+.input-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.input-dialog {
+  background: var(--dialog-background);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  min-width: 320px;
+  max-width: 480px;
+  width: 90%;
+  animation: slideUp 0.2s ease-out;
+  overflow: hidden;
+}
+
+.input-dialog-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.input-dialog-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.input-dialog-body {
+  padding: 20px;
+}
+
+.input-dialog-message {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.input-dialog-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--input-background);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-dialog-input:focus {
+  border-color: var(--accent-color);
+}
+
+.input-dialog-footer {
+  padding: 12px 20px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-color);
+  background: var(--dialog-footer-background);
+}
+
+.input-dialog-button {
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.input-dialog-button-secondary {
+  background: var(--button-secondary-background);
+  color: var(--text-secondary);
+}
+
+.input-dialog-button-secondary:hover {
+  background: var(--button-secondary-hover);
+}
+
+.input-dialog-button-primary {
+  background: var(--accent-color);
+  color: white;
+}
+
+.input-dialog-button-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.input-dialog-button-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 主题变量 */
+.theme-light {
+  --border-color: #e0e0e0;
+  --dialog-background: #ffffff;
+  --dialog-footer-background: #f5f5f5;
+  --input-background: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --accent-color: #1976d2;
+  --button-secondary-background: #f0f0f0;
+  --button-secondary-hover: #e0e0e0;
+}
+
+.theme-dark {
+  --border-color: #3a3a3a;
+  --dialog-background: #2d2d2d;
+  --dialog-footer-background: #1e1e1e;
+  --input-background: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --accent-color: #64b5f6;
+  --button-secondary-background: #3a3a3a;
+  --button-secondary-hover: #4a4a4a;
+}

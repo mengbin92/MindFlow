@@ -1,9 +1,24 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::env;
 use std::fs;
 use std::path::Path;
 use tauri::State;
 use walkdir::WalkDir;
+
+/// 展开路径中的 ~ 符号为用户主目录
+fn expand_home(path: &str) -> String {
+    if path.starts_with("~/") || path == "~" {
+        if let Some(home) = env::var("HOME").ok().or_else(|| env::var("USERPROFILE").ok()) {
+            return if path == "~" {
+                home
+            } else {
+                format!("{}{}", home, &path[1..])
+            };
+        }
+    }
+    path.to_string()
+}
 
 // 文件信息结构
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -26,19 +41,22 @@ pub struct FileSystemState {
 
 #[tauri::command]
 async fn read_file(path: String) -> Result<String, String> {
-    fs::read_to_string(&path)
+    let expanded = expand_home(&path);
+    fs::read_to_string(&expanded)
         .map_err(|e| format!("Failed to read file: {}", e))
 }
 
 #[tauri::command]
 async fn write_file(path: String, content: String) -> Result<(), String> {
-    fs::write(&path, content)
+    let expanded = expand_home(&path);
+    fs::write(&expanded, content)
         .map_err(|e| format!("Failed to write file: {}", e))
 }
 
 #[tauri::command]
 async fn create_file(path: String) -> Result<FileInfo, String> {
-    let path_obj = Path::new(&path);
+    let expanded = expand_home(&path);
+    let path_obj = Path::new(&expanded);
 
     // 创建父目录（如果不存在）
     if let Some(parent) = path_obj.parent() {
@@ -47,7 +65,7 @@ async fn create_file(path: String) -> Result<FileInfo, String> {
     }
 
     // 创建文件
-    fs::File::create(&path)
+    fs::File::create(&path_obj)
         .map_err(|e| format!("Failed to create file: {}", e))?;
 
     file_info_from_path(&path_obj, true)
@@ -55,21 +73,24 @@ async fn create_file(path: String) -> Result<FileInfo, String> {
 
 #[tauri::command]
 async fn create_dir(path: String) -> Result<FileInfo, String> {
-    fs::create_dir_all(&path)
+    let expanded = expand_home(&path);
+    let path_obj = Path::new(&expanded);
+    fs::create_dir_all(&path_obj)
         .map_err(|e| format!("Failed to create directory: {}", e))?;
 
-    file_info_from_path(Path::new(&path), true)
+    file_info_from_path(&path_obj, true)
 }
 
 #[tauri::command]
 async fn delete_file(path: String) -> Result<(), String> {
-    let path_obj = Path::new(&path);
+    let expanded = expand_home(&path);
+    let path_obj = Path::new(&expanded);
 
     if path_obj.is_dir() {
-        fs::remove_dir_all(&path)
+        fs::remove_dir_all(&path_obj)
             .map_err(|e| format!("Failed to remove directory: {}", e))?;
     } else {
-        fs::remove_file(&path)
+        fs::remove_file(&path_obj)
             .map_err(|e| format!("Failed to remove file: {}", e))?;
     }
 
@@ -78,15 +99,18 @@ async fn delete_file(path: String) -> Result<(), String> {
 
 #[tauri::command]
 async fn rename_file(old_path: String, new_path: String) -> Result<FileInfo, String> {
-    fs::rename(&old_path, &new_path)
+    let expanded_old = expand_home(&old_path);
+    let expanded_new = expand_home(&new_path);
+    fs::rename(&expanded_old, &expanded_new)
         .map_err(|e| format!("Failed to rename: {}", e))?;
 
-    file_info_from_path(Path::new(&new_path), true)
+    file_info_from_path(Path::new(&expanded_new), true)
 }
 
 #[tauri::command]
 async fn read_directory(path: String) -> Result<Vec<FileInfo>, String> {
-    let path_obj = Path::new(&path);
+    let expanded = expand_home(&path);
+    let path_obj = Path::new(&expanded);
 
     if !path_obj.exists() {
         return Err("Directory does not exist".to_string());
@@ -98,7 +122,7 @@ async fn read_directory(path: String) -> Result<Vec<FileInfo>, String> {
 
     let mut files = Vec::new();
 
-    for entry in WalkDir::new(&path)
+    for entry in WalkDir::new(&path_obj)
         .min_depth(1)
         .max_depth(1)
         .into_iter()
@@ -122,10 +146,13 @@ async fn read_directory(path: String) -> Result<Vec<FileInfo>, String> {
 
 #[tauri::command]
 async fn get_file_tree(path: String) -> Result<FileInfo, String> {
-    let path_obj = Path::new(&path);
+    let expanded = expand_home(&path);
+    let path_obj = Path::new(&expanded);
 
+    // 如果目录不存在，自动创建
     if !path_obj.exists() {
-        return Err("Path does not exist".to_string());
+        fs::create_dir_all(&path_obj)
+            .map_err(|e| format!("Failed to create directory: {}", e))?;
     }
 
     build_file_tree(&path_obj, None)
@@ -137,10 +164,11 @@ async fn search_files(
     query: String,
     _state: State<'_, FileSystemState>,
 ) -> Result<Vec<FileInfo>, String> {
+    let expanded = expand_home(&path);
     let query_lower = query.to_lowercase();
     let mut results = Vec::new();
 
-    for entry in WalkDir::new(&path)
+    for entry in WalkDir::new(&expanded)
         .into_iter()
         .filter_map(|e| e.ok())
     {
@@ -180,7 +208,8 @@ async fn watch_directory(
 ) -> Result<(), String> {
     use notify::{EventKind, RecursiveMode, Watcher};
 
-    let path_obj = Path::new(&path);
+    let expanded = expand_home(&path);
+    let path_obj = Path::new(&expanded);
 
     let mut watcher = notify::recommended_watcher(move |res| {
         match res {

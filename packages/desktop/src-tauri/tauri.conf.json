@@ -22,6 +22,12 @@
         "open": true,
         "save": true
       },
+      "path": {
+        "all": true
+      },
+      "os": {
+        "all": true
+      },
       "fs": {
         "all": false,
         "readFile": true,

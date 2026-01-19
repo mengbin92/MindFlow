@@ -6,13 +6,12 @@
  * @license MIT
  */
 
-import { keymap } from '@codemirror/view';
 import { EditorView } from '@codemirror/view';
 
 /**
  * 快捷键回调函数类型
  */
-type ShortcutHandler = (view: EditorView) => void;
+type ShortcutHandler = (view: EditorView) => boolean;
 
 /**
  * 快捷键配置接口
@@ -89,7 +88,7 @@ export class ShortcutManager {
    * ```
    */
   toKeymap() {
-    return this.shortcuts.map(shortcut => ({
+    return Array.from(this.shortcuts.values()).map(shortcut => ({
       key: shortcut.key,
       run: shortcut.handler,
     }));
@@ -100,7 +99,7 @@ export class ShortcutManager {
    * @returns 包含快捷键和描述的对象数组
    */
   getHelp(): Array<{ key: string; description: string }> {
-    return this.shortcuts.map(shortcut => ({
+    return Array.from(this.shortcuts.values()).map(shortcut => ({
       key: shortcut.key,
       description: shortcut.description,
     }));

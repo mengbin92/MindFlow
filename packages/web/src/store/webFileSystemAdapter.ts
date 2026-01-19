@@ -43,13 +43,13 @@ declare global {
  */
 async function handleToFileTreeNode(
   handle: FileSystemHandle,
-  path: string
+  _path: string
 ): Promise<FileTreeNode> {
-  const file = await (handle as FileSystemFileHandle).getFile();
+  const file = await ((handle as unknown) as FileSystemFileHandle).getFile();
   return {
-    id: path,
+    id: _path,
     name: handle.name,
-    path,
+    path: _path,
     isDir: false,
     size: file.size,
     modifiedTime: file.lastModified ? Math.floor(file.lastModified / 1000) : Date.now() / 1000,
@@ -70,7 +70,7 @@ async function buildFileTree(
     const fullPath = path ? `${path}/${name}` : name;
 
     if (handle.kind === 'directory') {
-      children.push(await buildFileTree(handle as FileSystemDirectoryHandle, fullPath));
+      children.push(await buildFileTree(((handle as unknown) as FileSystemDirectoryHandle), fullPath));
     } else {
       children.push(await handleToFileTreeNode(handle, fullPath));
     }
@@ -280,6 +280,6 @@ export async function getRecentFiles(): Promise<FileTreeNode[]> {
 /**
  * 监听目录变化（Web端暂不支持）
  */
-export async function watchDirectory(path: string): Promise<void> {
+export async function watchDirectory(_path: string): Promise<void> {
   console.warn('File watching is not supported in web environment');
 }

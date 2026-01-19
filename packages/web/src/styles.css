@@ -467,3 +467,179 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ====================
+   扩展语法样式
+   ==================== */
+
+/* LaTeX 公式样式 */
+.preview-content .katex {
+  font-size: 1.1em;
+}
+
+.preview-content .katex-display {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.preview-content .latex-block {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.editor-container.theme-dark .preview-content .katex-display {
+  background-color: #2d2d2d;
+}
+
+.editor-container.theme-dark .preview-content .katex {
+  color: #d4d4d4;
+}
+
+.preview-content .latex-error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  display: inline-block;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.editor-container.theme-dark .preview-content .latex-error {
+  background-color: #5a1e1e;
+  color: #ffb3b3;
+}
+
+/* Mermaid 图表样式 */
+.preview-content .mermaid {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+}
+
+.preview-content .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.editor-container.theme-dark .preview-content .mermaid {
+  background-color: #2d2d2d;
+}
+
+.preview-content .mermaid-error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  font-family: monospace;
+}
+
+.editor-container.theme-dark .preview-content .mermaid-error {
+  background-color: #5a1e1e;
+  color: #ffb3b3;
+}
+
+/* Markmap 思维导图样式 */
+.preview-content .markmap-container {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.preview-content .markmap {
+  display: block;
+  width: 100%;
+  height: 400px;
+}
+
+.editor-container.theme-dark .preview-content .markmap-container {
+  background-color: #2d2d2d;
+}
+
+.preview-content .markmap-error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  font-family: monospace;
+}
+
+.editor-container.theme-dark .preview-content .markmap-error {
+  background-color: #5a1e1e;
+  color: #ffb3b3;
+}
+
+/* PlantUML 图表样式 */
+.preview-content .plantuml-diagram {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  padding: 1rem;
+}
+
+.editor-container.theme-dark .preview-content .plantuml-diagram {
+  background-color: #2d2d2d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.preview-content .plantuml-error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  font-family: monospace;
+}
+
+.editor-container.theme-dark .preview-content .plantuml-error {
+  background-color: #5a1e1e;
+  color: #ffb3b3;
+}
+
+/* 懒加载占位符样式 */
+.preview-content .lazy-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.editor-container.theme-dark .preview-content .lazy-loading {
+  background-color: #2d2d2d;
+  color: #858585;
+}
+
+.preview-content .lazy-loading::after {
+  content: 'Loading...';
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

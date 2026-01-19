@@ -70,6 +70,35 @@
   font-size: 14px;
 }
 
+.open-directory-button {
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 6px;
+  background-color: var(--bg-primary, #fff);
+  color: var(--color-primary, #213547);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.open-directory-button:hover:not(:disabled) {
+  background-color: var(--bg-hover, #f5f5f5);
+  border-color: var(--color-primary, #213547);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.open-directory-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.open-directory-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* 子节点容器 */
 .file-tree-children {
   animation: slideDown 0.2s ease;

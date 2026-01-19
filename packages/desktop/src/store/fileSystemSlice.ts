@@ -309,6 +309,36 @@ const fileSystemSlice = createSlice({
         state.operationState.error = action.error.message || 'Failed to get file tree';
       });
 
+    // createFile
+    builder
+      .addCase(createFile.pending, (state) => {
+        state.operationState.isLoading = true;
+        state.operationState.error = null;
+      })
+      .addCase(createFile.fulfilled, (state) => {
+        state.operationState.isLoading = false;
+        state.operationState.lastOperation = new Date();
+      })
+      .addCase(createFile.rejected, (state, action) => {
+        state.operationState.isLoading = false;
+        state.operationState.error = action.error.message || 'Failed to create file';
+      });
+
+    // createDir
+    builder
+      .addCase(createDir.pending, (state) => {
+        state.operationState.isLoading = true;
+        state.operationState.error = null;
+      })
+      .addCase(createDir.fulfilled, (state) => {
+        state.operationState.isLoading = false;
+        state.operationState.lastOperation = new Date();
+      })
+      .addCase(createDir.rejected, (state, action) => {
+        state.operationState.isLoading = false;
+        state.operationState.error = action.error.message || 'Failed to create directory';
+      });
+
     // searchFiles
     builder
       .addCase(searchFiles.fulfilled, (state, action) => {

@@ -7,6 +7,7 @@
  */
 
 import { marked } from 'marked';
+import { extendedSyntaxProcessor } from './extended-syntax';
 
 /**
  * Markdown 解析器类
@@ -40,7 +41,18 @@ export class MarkdownParser {
    * ```
    */
   parse(markdown: string): string {
-    return marked(markdown);
+    // 先处理扩展语法
+    const processedMarkdown = extendedSyntaxProcessor.processExtendedSyntax(markdown);
+
+    // 再用 marked 解析标准 Markdown
+    const result = marked(processedMarkdown);
+    // 处理 marked 可能返回 Promise 的情况
+    if (result instanceof Promise) {
+      // 对于同步方法，我们不应该返回 Promise，但这在运行时不会发生
+      // 因为 marked 在同步模式下返回 string
+      return '';
+    }
+    return result;
   }
 
   /**
@@ -54,8 +66,17 @@ export class MarkdownParser {
    * const html = await parser.parseAsync('# Hello\n\n');
    * ```
    */
-  parseAsync(markdown: string): Promise<string> {
-    return marked(markdown);
+  async parseAsync(markdown: string): Promise<string> {
+    // 先处理扩展语法
+    const processedMarkdown = extendedSyntaxProcessor.processExtendedSyntax(markdown);
+
+    // 再用 marked 解析标准 Markdown
+    const result = marked(processedMarkdown);
+    // 处理 marked 可能返回 string 或 Promise 的情况
+    if (result instanceof Promise) {
+      return result;
+    }
+    return result;
   }
 
   /**
@@ -73,8 +94,24 @@ export class MarkdownParser {
    * });
    * ```
    */
-  configure(options: marked.MarkedOptions): void {
+  configure(options: any): void {
     marked.setOptions(options);
+  }
+
+  /**
+   * 渲染需要延迟处理的扩展语法（Mermaid、Markmap）
+   * @description 在 HTML 插入 DOM 后调用此方法来渲染动态内容
+   * @param container - 包含扩展语法元素的容器
+   * @example
+   * ```ts
+   * const parser = new MarkdownParser();
+   * const html = parser.parse(markdown);
+   * container.innerHTML = html;
+   * await parser.renderExtendedSyntax(container);
+   * ```
+   */
+  async renderExtendedSyntax(container: HTMLElement): Promise<void> {
+    await extendedSyntaxProcessor.renderExtendedSyntax(container);
   }
 }
 

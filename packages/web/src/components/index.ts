@@ -7,3 +7,6 @@
  */
 
 export { default as Editor } from './Editor';
+export { default as FileTree } from './FileTree';
+export { default as FileList } from './FileList';
+export { default as SearchBar } from './SearchBar';
