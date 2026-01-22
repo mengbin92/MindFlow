@@ -146,15 +146,17 @@ body {
 .editor-container {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   overflow: hidden;
+  position: relative;
 }
 
 /* 编辑器占位符 */
 .editor-placeholder {
   text-align: center;
   color: var(--color-secondary);
+  padding: 2rem;
 }
 
 .editor-placeholder h2 {
@@ -166,6 +168,13 @@ body {
 .editor-placeholder p {
   font-size: 1rem;
   color: var(--color-secondary);
+}
+
+/* ==================== Editor 组件样式 ==================== */
+
+.editor-container > div {
+  width: 100%;
+  height: 100%;
 }
 
 /* ==================== 滚动条样式 ==================== */

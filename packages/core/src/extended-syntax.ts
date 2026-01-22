@@ -9,7 +9,10 @@
 // @ts-ignore - KaTeX types may not be fully resolved
 import katex from 'katex';
 import mermaid from 'mermaid';
-import encode from 'plantuml-encoder';
+
+// Type declaration for plantuml-encoder (inline)
+// @ts-ignore
+const encode = require('plantuml-encoder');
 
 /**
  * 扩展语法类型

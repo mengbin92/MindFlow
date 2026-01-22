@@ -53,3 +53,18 @@ export {
   extendedSyntaxProcessor,
   ExtendedSyntaxType,
 } from './extended-syntax';
+
+/**
+ * 导出导出功能
+ * @description 支持 PDF、HTML、图片等多种格式的导出功能
+ */
+export { Exporter, exporter } from './exporter';
+export type { ExportOptions, ExportResult } from './exporter';
+export { ExportFormat } from './exporter';
+
+/**
+ * 导出演示模式功能
+ * @description 基于 reveal.js 的 PPT 演示功能
+ */
+export { Presenter, presenter } from './presentation';
+export type { PresentationOptions, PresentationState, SlideInfo } from './presentation';

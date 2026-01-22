@@ -8,13 +8,15 @@
 
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { FileTree } from './components/FileTree';
 import { FileList } from './components/FileList';
 import { SearchBar } from './components/SearchBar';
 import { Toolbar } from './components/Toolbar';
+import Editor from './components/Editor';
 import { store } from './store';
 import { getFileTree } from './store/fileSystemSlice';
+import { RootState } from './store';
 import './styles.css';
 
 /**
@@ -24,6 +26,12 @@ function AppContent(): JSX.Element {
   const dispatch = useDispatch();
   // 当前主题状态
   const [currentTheme, setCurrentTheme] = React.useState<'light' | 'dark'>('light');
+
+  // 从 Redux 获取当前文件
+  const currentFile = useSelector((state: RootState) => state.fileSystem.currentFile);
+
+  // 编辑器内容状态
+  const [editorContent, setEditorContent] = React.useState<string>('# Welcome to MindFlow\n\nStart writing your markdown...');
 
   useEffect(() => {
     // 从localStorage读取主题
@@ -65,6 +73,15 @@ function AppContent(): JSX.Element {
     handleThemeChange(newTheme);
   };
 
+  /**
+   * 处理编辑器内容变化
+   */
+  const handleEditorChange = (value: string) => {
+    setEditorContent(value);
+    // TODO: 保存到文件系统（后续实现）
+    console.log('Editor content changed:', value.substring(0, 50) + '...');
+  };
+
   return (
     <div className={`app-container theme-${currentTheme}`}>
       {/* 侧边栏：文件树和搜索 */}
@@ -98,12 +115,25 @@ function AppContent(): JSX.Element {
         {/* 文件列表（标签页） */}
         <FileList className="file-list-bar" />
 
-        {/* 编辑器占位符 - 需要后续集成编辑器组件 */}
+        {/* 编辑器 */}
         <div className="editor-container">
-          <div className="editor-placeholder">
-            <h2>Editor</h2>
-            <p>Select a file to start editing</p>
-          </div>
+          {currentFile ? (
+            <Editor
+              initialValue={editorContent}
+              docId={currentFile.path}
+              theme={currentTheme}
+              autoSave={true}
+              onChange={handleEditorChange}
+            />
+          ) : (
+            <div className="editor-placeholder">
+              <h2>👋 Welcome to MindFlow</h2>
+              <p>Select a file from the sidebar to start editing</p>
+              <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--color-secondary)' }}>
+                Or create a new file using the toolbar above
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>
