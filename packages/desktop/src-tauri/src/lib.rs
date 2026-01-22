@@ -6,6 +6,57 @@ use std::path::Path;
 use tauri::State;
 use walkdir::WalkDir;
 
+// ==================== 配置相关结构 ====================
+
+/// 应用配置结构
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AppConfig {
+    pub theme: String,
+    pub font_size: u32,
+    pub font_family: String,
+    pub tab_size: u32,
+    pub word_wrap: bool,
+    pub line_numbers: bool,
+    pub auto_save: bool,
+    pub auto_save_delay: u32,
+}
+
+/// 默认配置
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self {
+            theme: "light".to_string(),
+            font_size: 14,
+            font_family: "Fira Code".to_string(),
+            tab_size: 4,
+            word_wrap: true,
+            line_numbers: true,
+            auto_save: true,
+            auto_save_delay: 1000,
+        }
+    }
+}
+
+/// 获取配置文件路径
+fn get_config_path() -> Result<std::path::PathBuf, String> {
+    let config_dir = if let Ok(home) = env::var("HOME") {
+        format!("{}/.config/mindflow", home)
+    } else if let Ok(appdata) = env::var("APPDATA") {
+        format!("{}\\MindFlow", appdata)
+    } else {
+        return Err("无法确定配置目录".to_string());
+    };
+
+    let config_path = std::path::PathBuf::from(config_dir);
+
+    // 确保配置目录存在
+    fs::create_dir_all(&config_path)
+        .map_err(|e| format!("Failed to create config directory: {}", e))?;
+
+    Ok(config_path.join("config.json"))
+}
+
 /// 展开路径中的 ~ 符号为用户主目录
 fn expand_home(path: &str) -> String {
     if path.starts_with("~/") || path == "~" {
@@ -331,7 +382,83 @@ fn generate_id(path: &Path) -> String {
     format!("{:x}", hasher.finish())
 }
 
-// Tauri命令注册
+// ==================== 配置管理命令 ====================
+
+/// 保存配置到文件
+#[tauri::command]
+async fn save_config(config: AppConfig) -> Result<AppConfig, String> {
+    let config_path = get_config_path()?;
+    let config_json = serde_json::to_string_pretty(&config)
+        .map_err(|e| format!("Failed to serialize config: {}", e))?;
+
+    fs::write(&config_path, config_json)
+        .map_err(|e| format!("Failed to write config file: {}", e))?;
+
+    Ok(config)
+}
+
+/// 从文件加载配置
+#[tauri::command]
+async fn load_config() -> Result<AppConfig, String> {
+    let config_path = get_config_path()?;
+
+    if !config_path.exists() {
+        // 如果配置文件不存在，返回默认配置
+        return Ok(AppConfig::default());
+    }
+
+    let config_content = fs::read_to_string(&config_path)
+        .map_err(|e| format!("Failed to read config file: {}", e))?;
+
+    let config: AppConfig = serde_json::from_str(&config_content)
+        .map_err(|e| format!("Failed to parse config file: {}", e))?;
+
+    Ok(config)
+}
+
+/// 导出配置到指定文件
+#[tauri::command]
+async fn export_config(config: AppConfig, file_path: String) -> Result<(), String> {
+    let expanded = expand_home(&file_path);
+    let path_obj = Path::new(&expanded);
+
+    // 确保父目录存在
+    if let Some(parent) = path_obj.parent() {
+        fs::create_dir_all(parent)
+            .map_err(|e| format!("Failed to create directory: {}", e))?;
+    }
+
+    let config_json = serde_json::to_string_pretty(&config)
+        .map_err(|e| format!("Failed to serialize config: {}", e))?;
+
+    fs::write(&path_obj, config_json)
+        .map_err(|e| format!("Failed to write export file: {}", e))?;
+
+    Ok(())
+}
+
+/// 从指定文件导入配置
+#[tauri::command]
+async fn import_config(file_path: String) -> Result<AppConfig, String> {
+    let expanded = expand_home(&file_path);
+    let config_content = fs::read_to_string(&expanded)
+        .map_err(|e| format!("Failed to read import file: {}", e))?;
+
+    let config: AppConfig = serde_json::from_str(&config_content)
+        .map_err(|e| format!("Failed to parse config file: {}", e))?;
+
+    // 同时保存到默认配置文件
+    let config_path = get_config_path()?;
+    let config_json = serde_json::to_string_pretty(&config)
+        .map_err(|e| format!("Failed to serialize config: {}", e))?;
+
+    fs::write(&config_path, config_json)
+        .map_err(|e| format!("Failed to write config file: {}", e))?;
+
+    Ok(config)
+}
+
+// ==================== Tauri命令注册 ====================
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -350,6 +477,10 @@ pub fn run() {
             search_files,
             get_recent_files,
             watch_directory,
+            save_config,
+            load_config,
+            export_config,
+            import_config,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

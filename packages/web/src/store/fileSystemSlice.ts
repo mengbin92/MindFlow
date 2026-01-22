@@ -266,7 +266,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(readFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = Date.now();
+        state.operationState.lastOperation = new Date();
 
         // 更新文件内容
         const { path, content } = action.payload;
@@ -288,7 +288,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(writeFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = Date.now();
+        state.operationState.lastOperation = new Date();
 
         // 更新文件内容
         const { path, content } = action.payload;
@@ -310,7 +310,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(getFileTree.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = Date.now();
+        state.operationState.lastOperation = new Date();
         state.currentDirectory = action.payload.path;
         state.fileTree = action.payload.fileTree;
       })

@@ -14,8 +14,11 @@ import { FileList } from './components/FileList';
 import { SearchBar } from './components/SearchBar';
 import { Toolbar } from './components/Toolbar';
 import Editor from './components/Editor';
+import ThemeToggle from './components/Settings/ThemeToggle';
+import SettingsDialog from './components/Settings/SettingsDialog';
 import { store } from './store';
 import { getFileTree } from './store/fileSystemSlice';
+import { loadConfig } from './store/configSlice';
 import { RootState } from './store';
 import './styles.css';
 
@@ -24,8 +27,9 @@ import './styles.css';
  */
 function AppContent(): JSX.Element {
   const dispatch = useDispatch();
-  // 当前主题状态
-  const [currentTheme, setCurrentTheme] = React.useState<'light' | 'dark'>('light');
+
+  // 从 Redux 获取配置状态
+  const config = useSelector((state: RootState) => state.config.config);
 
   // 从 Redux 获取当前文件
   const currentFile = useSelector((state: RootState) => state.fileSystem.currentFile);
@@ -33,13 +37,18 @@ function AppContent(): JSX.Element {
   // 编辑器内容状态
   const [editorContent, setEditorContent] = React.useState<string>('# Welcome to MindFlow\n\nStart writing your markdown...');
 
+  // 设置对话框状态
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+
   useEffect(() => {
-    // 从localStorage读取主题
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (savedTheme) {
-      setCurrentTheme(savedTheme);
-      document.documentElement.classList.add(`theme-${savedTheme}`);
-    }
+    // 初始化配置
+    const initConfig = async () => {
+      try {
+        await dispatch(loadConfig() as any);
+      } catch (error) {
+        console.error('Failed to load config:', error);
+      }
+    };
 
     // 初始化工作目录
     const initWorkspace = async () => {
@@ -52,26 +61,9 @@ function AppContent(): JSX.Element {
       }
     };
 
+    initConfig();
     initWorkspace();
   }, [dispatch]);
-
-  /**
-   * 处理主题变化
-   */
-  const handleThemeChange = (theme: 'light' | 'dark') => {
-    setCurrentTheme(theme);
-    localStorage.setItem('theme', theme);
-    document.documentElement.classList.remove('theme-light', 'theme-dark');
-    document.documentElement.classList.add(`theme-${theme}`);
-  };
-
-  /**
-   * 切换主题
-   */
-  const toggleTheme = () => {
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    handleThemeChange(newTheme);
-  };
 
   /**
    * 处理编辑器内容变化
@@ -82,20 +74,34 @@ function AppContent(): JSX.Element {
     console.log('Editor content changed:', value.substring(0, 50) + '...');
   };
 
+  // 获取当前显示的主题（处理 auto 模式）
+  const getDisplayTheme = (): 'light' | 'dark' => {
+    if (config.theme === 'auto') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return config.theme;
+  };
+
+  const displayTheme = getDisplayTheme();
+
   return (
-    <div className={`app-container theme-${currentTheme}`}>
+    <div className={`app-container theme-${config.theme}`}>
       {/* 侧边栏：文件树和搜索 */}
       <aside className="sidebar">
         {/* 侧边栏头部 */}
         <div className="sidebar-header">
           <h1 className="app-title">MindFlow</h1>
-          <button
-            className="theme-toggle"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-          >
-            {currentTheme === 'light' ? '🌙' : '☀️'}
-          </button>
+          <div className="sidebar-header-actions">
+            <button
+              className="settings-button-icon"
+              onClick={() => setIsSettingsOpen(true)}
+              title="设置"
+              aria-label="打开设置"
+            >
+              ⚙️
+            </button>
+            <ThemeToggle iconOnly={true} />
+          </div>
         </div>
 
         {/* 工具栏 */}
@@ -121,8 +127,9 @@ function AppContent(): JSX.Element {
             <Editor
               initialValue={editorContent}
               docId={currentFile.path}
-              theme={currentTheme}
-              autoSave={true}
+              theme={displayTheme}
+              autoSave={config.autoSave}
+              autoSaveDelay={config.autoSaveDelay}
               onChange={handleEditorChange}
             />
           ) : (
@@ -136,6 +143,12 @@ function AppContent(): JSX.Element {
           )}
         </div>
       </main>
+
+      {/* 设置对话框 */}
+      <SettingsDialog
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </div>
   );
 }

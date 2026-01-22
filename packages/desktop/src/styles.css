@@ -2,6 +2,11 @@
  * App 组件样式 - 三栏布局（桌面端）
  */
 
+/* ==================== 字体定义 ==================== */
+
+/* Fira Code 字体（通过 Google Fonts 加载） */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
+
 /* 全局样式 */
 * {
   margin: 0;
@@ -27,16 +32,88 @@ body {
 
 /* CSS 变量定义 */
 :root {
-  /* 浅色主题 */
+  /* ==================== 浅色主题 ==================== */
+  /* 文本颜色 */
   --color-primary: #213547;
   --color-secondary: #666;
+  --color-muted: #999;
+  --color-disabled: #ccc;
+  --color-error: #dc3545;
+  --color-warning: #ffc107;
+  --color-success: #28a745;
+  --color-info: #17a2b8;
+
+  /* 背景颜色 */
   --bg-primary: #ffffff;
   --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8e8e8;
   --bg-hover: rgba(0, 0, 0, 0.05);
   --bg-selected: rgba(33, 53, 71, 0.1);
+  --bg-active: rgba(33, 53, 71, 0.15);
+
+  /* 边框颜色 */
   --border-color: #e0e0e0;
+  --border-color-hover: #ccc;
+  --border-color-focus: #007acc;
+
+  /* 强调色 */
   --accent-color: #213547;
+  --accent-hover: #1a2a3a;
   --highlight-color: #ffeb3b;
+
+  /* 编辑器颜色 */
+  --editor-bg: #ffffff;
+  --editor-text: #213547;
+  --editor-gutter: #f5f5f5;
+  --editor-gutter-text: #999;
+  --editor-line-number: #999;
+  --editor-line-number-active: #213547;
+  --editor-selection: rgba(33, 53, 71, 0.15);
+  --editor-cursor: #213547;
+  --editor-current-line: rgba(33, 53, 71, 0.05);
+
+  /* 代码高亮 - 浅色 */
+  --code-keyword: #0000ff;
+  --code-string: #a31515;
+  --code-comment: #008000;
+  --code-number: #098658;
+  --code-function: #795e26;
+  --code-variable: #001080;
+  --code-type: #267f99;
+  --code-operator: #333;
+  --code-punctuation: #333;
+
+  /* 字体 */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  --font-family-mono: 'Fira Code', 'Consolas', 'Monaco', 'Courier New',
+    monospace;
+  --font-size-base: 14px;
+  --font-size-large: 16px;
+  --font-size-small: 12px;
+
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* 过渡 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
 
   /* 尺寸 */
   --sidebar-width: 280px;
@@ -44,17 +121,116 @@ body {
   --file-list-height: 40px;
 }
 
-/* 深色主题 */
+/* ==================== 深色主题 ==================== */
 .theme-dark {
+  /* 文本颜色 */
   --color-primary: #d4d4d4;
   --color-secondary: #999;
+  --color-muted: #666;
+  --color-disabled: #444;
+  --color-error: #f48771;
+  --color-warning: #dcdcaa;
+  --color-success: #89d185;
+  --color-info: #75beff;
+
+  /* 背景颜色 */
   --bg-primary: #1e1e1e;
   --bg-secondary: #252526;
+  --bg-tertiary: #2d2d30;
   --bg-hover: rgba(255, 255, 255, 0.1);
   --bg-selected: rgba(255, 255, 255, 0.15);
+  --bg-active: rgba(255, 255, 255, 0.2);
+
+  /* 边框颜色 */
   --border-color: #3e3e42;
+  --border-color-hover: #555;
+  --border-color-focus: #007acc;
+
+  /* 强调色 */
   --accent-color: #007acc;
+  --accent-hover: #1e90ff;
   --highlight-color: #613214;
+
+  /* 编辑器颜色 */
+  --editor-bg: #1e1e1e;
+  --editor-text: #d4d4d4;
+  --editor-gutter: #252526;
+  --editor-gutter-text: #858585;
+  --editor-line-number: #858585;
+  --editor-line-number-active: #d4d4d4;
+  --editor-selection: rgba(255, 255, 255, 0.15);
+  --editor-cursor: #d4d4d4;
+  --editor-current-line: rgba(255, 255, 255, 0.05);
+
+  /* 代码高亮 - 深色 */
+  --code-keyword: #569cd6;
+  --code-string: #ce9178;
+  --code-comment: #6a9955;
+  --code-number: #b5cea8;
+  --code-function: #dcdcaa;
+  --code-variable: #9cdcfe;
+  --code-type: #4ec9b0;
+  --code-operator: #d4d4d4;
+  --code-punctuation: #d4d4d4;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* 自动主题（跟随系统） */
+@media (prefers-color-scheme: dark) {
+  .theme-auto {
+    /* 继承深色主题 */
+    --color-primary: #d4d4d4;
+    --color-secondary: #999;
+    --color-muted: #666;
+    --color-disabled: #444;
+    --color-error: #f48771;
+    --color-warning: #dcdcaa;
+    --color-success: #89d185;
+    --color-info: #75beff;
+
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #2d2d30;
+    --bg-hover: rgba(255, 255, 255, 0.1);
+    --bg-selected: rgba(255, 255, 255, 0.15);
+    --bg-active: rgba(255, 255, 255, 0.2);
+
+    --border-color: #3e3e42;
+    --border-color-hover: #555;
+    --border-color-focus: #007acc;
+
+    --accent-color: #007acc;
+    --accent-hover: #1e90ff;
+    --highlight-color: #613214;
+
+    --editor-bg: #1e1e1e;
+    --editor-text: #d4d4d4;
+    --editor-gutter: #252526;
+    --editor-gutter-text: #858585;
+    --editor-line-number: #858585;
+    --editor-line-number-active: #d4d4d4;
+    --editor-selection: rgba(255, 255, 255, 0.15);
+    --editor-cursor: #d4d4d4;
+    --editor-current-line: rgba(255, 255, 255, 0.05);
+
+    --code-keyword: #569cd6;
+    --code-string: #ce9178;
+    --code-comment: #6a9955;
+    --code-number: #b5cea8;
+    --code-function: #dcdcaa;
+    --code-variable: #9cdcfe;
+    --code-type: #4ec9b0;
+    --code-operator: #d4d4d4;
+    --code-punctuation: #d4d4d4;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+  }
 }
 
 /* 应用容器 */
@@ -94,6 +270,34 @@ body {
   font-size: 18px;
   font-weight: 600;
   color: var(--color-primary);
+}
+
+.sidebar-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.settings-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 16px;
+  transition: all var(--transition-fast);
+  color: var(--color-primary);
+  padding: 0;
+}
+
+.settings-button-icon:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-color);
+  transform: rotate(45deg);
 }
 
 .theme-toggle {
