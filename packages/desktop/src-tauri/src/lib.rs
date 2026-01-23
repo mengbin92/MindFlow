@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::env;
 use std::fs;
 use std::path::Path;
-use tauri::State;
+use tauri::{Manager, State};
 use walkdir::WalkDir;
 
 // ==================== 配置相关结构 ====================
@@ -36,6 +36,81 @@ impl Default for AppConfig {
             auto_save_delay: 1000,
         }
     }
+}
+
+// ==================== 窗口状态相关结构 ====================
+
+/// 窗口状态
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct WindowState {
+    pub x: i32,
+    pub y: i32,
+    pub width: u32,
+    pub height: u32,
+    pub is_maximized: bool,
+    pub is_fullscreen: bool,
+}
+
+impl Default for WindowState {
+    fn default() -> Self {
+        Self {
+            x: 100,
+            y: 100,
+            width: 1280,
+            height: 800,
+            is_maximized: false,
+            is_fullscreen: false,
+        }
+    }
+}
+
+/// 获取窗口状态文件路径
+fn get_window_state_path() -> Result<std::path::PathBuf, String> {
+    let config_dir = if let Ok(home) = env::var("HOME") {
+        format!("{}/.config/mindflow", home)
+    } else if let Ok(appdata) = env::var("APPDATA") {
+        format!("{}\\MindFlow", appdata)
+    } else {
+        return Err("无法确定配置目录".to_string());
+    };
+
+    let config_path = std::path::PathBuf::from(config_dir);
+
+    // 确保配置目录存在
+    fs::create_dir_all(&config_path)
+        .map_err(|e| format!("Failed to create config directory: {}", e))?;
+
+    Ok(config_path.join("window_state.json"))
+}
+
+/// 保存窗口状态
+fn save_window_state(state: &WindowState) -> Result<(), String> {
+    let state_path = get_window_state_path()?;
+    let state_json = serde_json::to_string_pretty(&state)
+        .map_err(|e| format!("Failed to serialize window state: {}", e))?;
+
+    fs::write(&state_path, state_json)
+        .map_err(|e| format!("Failed to write window state file: {}", e))?;
+
+    Ok(())
+}
+
+/// 加载窗口状态
+fn load_window_state() -> Result<WindowState, String> {
+    let state_path = get_window_state_path()?;
+
+    if !state_path.exists() {
+        return Ok(WindowState::default());
+    }
+
+    let state_content = fs::read_to_string(&state_path)
+        .map_err(|e| format!("Failed to read window state file: {}", e))?;
+
+    let state: WindowState = serde_json::from_str(&state_content)
+        .map_err(|e| format!("Failed to parse window state file: {}", e))?;
+
+    Ok(state)
 }
 
 /// 获取配置文件路径
@@ -458,10 +533,230 @@ async fn import_config(file_path: String) -> Result<AppConfig, String> {
     Ok(config)
 }
 
+// ==================== 窗口管理命令 ====================
+
+/// 最小化窗口
+#[tauri::command]
+async fn minimize_window(window: tauri::Window) -> Result<(), String> {
+    window.minimize()
+        .map_err(|e| format!("Failed to minimize window: {}", e))
+}
+
+/// 最大化/还原窗口
+#[tauri::command]
+async fn toggle_maximize_window(window: tauri::Window) -> Result<bool, String> {
+    let is_maximized = window.is_maximized()
+        .map_err(|e| format!("Failed to get maximized state: {}", e))?;
+
+    if is_maximized {
+        window.unmaximize()
+            .map_err(|e| format!("Failed to unmaximize window: {}", e))?;
+        Ok(false)
+    } else {
+        window.maximize()
+            .map_err(|e| format!("Failed to maximize window: {}", e))?;
+        Ok(true)
+    }
+}
+
+/// 关闭窗口
+#[tauri::command]
+async fn close_window(window: tauri::Window) -> Result<(), String> {
+    window.close()
+        .map_err(|e| format!("Failed to close window: {}", e))
+}
+
+/// 显示窗口
+#[tauri::command]
+async fn show_window(window: tauri::Window) -> Result<(), String> {
+    window.show()
+        .map_err(|e| format!("Failed to show window: {}", e))?;
+    window.set_focus()
+        .map_err(|e| format!("Failed to set focus: {}", e))
+}
+
+/// 隐藏窗口
+#[tauri::command]
+async fn hide_window(window: tauri::Window) -> Result<(), String> {
+    window.hide()
+        .map_err(|e| format!("Failed to hide window: {}", e))
+}
+
+/// 设置窗口标题
+#[tauri::command]
+async fn set_window_title(window: tauri::Window, title: String) -> Result<(), String> {
+    window.set_title(&title)
+        .map_err(|e| format!("Failed to set window title: {}", e))
+}
+
+/// 全屏/还原窗口
+#[tauri::command]
+async fn toggle_fullscreen(window: tauri::Window) -> Result<bool, String> {
+    let is_fullscreen = window.is_fullscreen()
+        .map_err(|e| format!("Failed to get fullscreen state: {}", e))?;
+
+    if is_fullscreen {
+        window.set_fullscreen(false)
+            .map_err(|e| format!("Failed to exit fullscreen: {}", e))?;
+        Ok(false)
+    } else {
+        window.set_fullscreen(true)
+            .map_err(|e| format!("Failed to enter fullscreen: {}", e))?;
+        Ok(true)
+    }
+}
+
+/// 保存当前窗口状态
+#[tauri::command]
+async fn save_current_window_state(window: tauri::Window) -> Result<WindowState, String> {
+    let current_monitor = window.current_monitor()
+        .map_err(|e| format!("Failed to get current monitor: {}", e))?
+        .ok_or("No current monitor")?;
+
+    let monitor_position = current_monitor.position();
+    let monitor_size = current_monitor.size();
+
+    // 获取窗口位置和大小
+    let window_position = window.outer_position()
+        .map_err(|e| format!("Failed to get window position: {}", e))?;
+    let window_size = window.outer_size()
+        .map_err(|e| format!("Failed to get window size: {}", e))?;
+
+    // 计算相对于显示器的位置
+    let x = window_position.x - monitor_position.x;
+    let y = window_position.y - monitor_position.y;
+
+    let state = WindowState {
+        x,
+        y,
+        width: window_size.width,
+        height: window_size.height,
+        is_maximized: window.is_maximized()
+            .map_err(|e| format!("Failed to get maximized state: {}", e))?,
+        is_fullscreen: window.is_fullscreen()
+            .map_err(|e| format!("Failed to get fullscreen state: {}", e))?,
+    };
+
+    save_window_state(&state)?;
+
+    Ok(state)
+}
+
+/// 恢复窗口状态
+#[tauri::command]
+async fn restore_window_state(window: tauri::Window) -> Result<WindowState, String> {
+    let state = load_window_state()?;
+
+    // 获取当前显示器信息
+    let current_monitor = window.current_monitor()
+        .map_err(|e| format!("Failed to get current monitor: {}", e))?
+        .ok_or("No current monitor")?;
+
+    let monitor_position = current_monitor.position();
+    let monitor_size = current_monitor.size();
+
+    // 计算绝对位置
+    let x = monitor_position.x + state.x;
+    let y = monitor_position.y + state.y;
+
+    // 设置窗口位置和大小
+    window.set_position(tauri::Position::Logical(tauri::LogicalPosition::new(
+        state.x as f64,
+        state.y as f64,
+    )))
+        .map_err(|e| format!("Failed to set window position: {}", e))?;
+
+    window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(
+        state.width as f64,
+        state.height as f64,
+    )))
+        .map_err(|e| format!("Failed to set window size: {}", e))?;
+
+    // 恢复最大化/全屏状态
+    if state.is_maximized {
+        window.maximize()
+            .map_err(|e| format!("Failed to maximize window: {}", e))?;
+    } else if state.is_fullscreen {
+        window.set_fullscreen(true)
+            .map_err(|e| format!("Failed to set fullscreen: {}", e))?;
+    }
+
+    Ok(state)
+}
+
+/// 获取窗口状态
+#[tauri::command]
+async fn get_window_state() -> Result<WindowState, String> {
+    load_window_state()
+}
+
 // ==================== Tauri命令注册 ====================
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    use tauri::{CustomMenuItem, GlobalShortcutManager, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
+
+    // 创建系统托盘菜单
+    let tray_menu = SystemTrayMenu::new()
+        .add_item(CustomMenuItem::new("show".to_string(), "显示窗口"))
+        .add_item(CustomMenuItem::new("hide".to_string(), "隐藏窗口"))
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(CustomMenuItem::new("quit".to_string(), "退出"));
+
+    let system_tray = SystemTray::new().with_menu(tray_menu);
+
     tauri::Builder::default()
+        .system_tray(system_tray)
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::LeftClick {
+                position: _,
+                size: _,
+                ..
+            } => {
+                // 左键点击托盘图标：显示/隐藏窗口
+                if let Some(window) = app.get_window("main") {
+                    if window.is_visible().unwrap_or(false) {
+                        let _ = window.hide();
+                    } else {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                }
+            }
+            SystemTrayEvent::MenuItemClick { id, .. } => {
+                match id.as_str() {
+                    "show" => {
+                        if let Some(window) = app.get_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                    "hide" => {
+                        if let Some(window) = app.get_window("main") {
+                            let _ = window.hide();
+                        }
+                    }
+                    "quit" => {
+                        app.exit(0);
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        })
+        .setup(|app| {
+            // 注册全局快捷键：Ctrl/Cmd + Shift + M 显示/隐藏窗口
+            let mut shortcuts = app.global_shortcut_manager();
+
+            // 尝试注册全局快捷键
+            if let Err(e) = shortcuts.register("CmdOrCtrl+Shift+M", move || {
+                // 快捷键触发时的处理逻辑
+                println!("Global shortcut triggered: Show/Hide MindFlow");
+            }) {
+                eprintln!("Failed to register global shortcut: {}", e);
+            }
+
+            Ok(())
+        })
         .manage(FileSystemState {
             open_files: HashMap::new(),
         })
@@ -481,6 +776,16 @@ pub fn run() {
             load_config,
             export_config,
             import_config,
+            minimize_window,
+            toggle_maximize_window,
+            close_window,
+            show_window,
+            hide_window,
+            set_window_title,
+            toggle_fullscreen,
+            save_current_window_state,
+            restore_window_state,
+            get_window_state,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

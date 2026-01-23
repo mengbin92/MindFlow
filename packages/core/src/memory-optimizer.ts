@@ -6,6 +6,8 @@
  * @license MIT
  */
 
+import React from 'react';
+
 /**
  * 资源类型
  */
@@ -298,7 +300,9 @@ export class LRUCache<K, V> {
     } else if (this.cache.size >= this.maxSize) {
       // 删除最旧的项（第一个）
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
     }
 
     this.cache.set(key, value);

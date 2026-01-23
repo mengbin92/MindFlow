@@ -9,6 +9,7 @@
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { useDispatch, useSelector } from 'react-redux';
+import { listen } from '@tauri-apps/api/event';
 import { FileTree } from './components/FileTree';
 import { FileList } from './components/FileList';
 import { SearchBar } from './components/SearchBar';
@@ -17,7 +18,7 @@ import Editor from './components/Editor';
 import ThemeToggle from './components/Settings/ThemeToggle';
 import SettingsDialog from './components/Settings/SettingsDialog';
 import { store } from './store';
-import { getFileTree } from './store/fileSystemSlice';
+import { getFileTree, readFile, openFile } from './store/fileSystemSlice';
 import { loadConfig } from './store/configSlice';
 import { RootState } from './store';
 import './styles.css';
@@ -63,6 +64,54 @@ function AppContent(): JSX.Element {
 
     initConfig();
     initWorkspace();
+
+    // 监听文件打开请求（通过文件关联或拖放）
+    const unlistenFileOpen = listen<string>('file-open-request', async (event) => {
+      const filePath = event.payload;
+      console.log('File open request:', filePath);
+
+      try {
+        // 读取文件内容
+        await dispatch(readFile(filePath) as any);
+
+        // 创建一个临时的文件节点
+        const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'Untitled';
+        const fileNode = {
+          id: filePath,
+          name: fileName,
+          path: filePath,
+          isDir: false,
+          children: undefined,
+          content: undefined,
+          modifiedTime: Date.now() / 1000,
+          size: 0,
+        };
+
+        // 打开文件
+        dispatch(openFile(fileNode));
+      } catch (error) {
+        console.error('Failed to open file:', error);
+      }
+    });
+
+    // 监听文件拖放悬停事件
+    const unlistenFileDropHover = listen<string[]>('file-drop-hover', (event) => {
+      console.log('File drop hover:', event.payload);
+      // 可以添加视觉反馈，例如高亮编辑器区域
+    });
+
+    // 监听文件拖放取消事件
+    const unlistenFileDropCancelled = listen('file-drop-cancelled', () => {
+      console.log('File drop cancelled');
+      // 移除视觉反馈
+    });
+
+    return () => {
+      // 清理事件监听器
+      unlistenFileOpen.then((fn) => fn());
+      unlistenFileDropHover.then((fn) => fn());
+      unlistenFileDropCancelled.then((fn) => fn());
+    };
   }, [dispatch]);
 
   /**

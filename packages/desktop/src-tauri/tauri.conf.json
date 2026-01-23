@@ -4,7 +4,8 @@
     "beforeBuildCommand": "pnpm run build",
     "beforeDevCommand": "pnpm run dev",
     "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "distDir": "../dist",
+    "withGlobalTauri": true
   },
   "package": {
     "productName": "MindFlow",
@@ -46,12 +47,40 @@
       "active": true,
       "targets": "all",
       "identifier": "com.mindflow.app",
+      "publisher": "MindFlow Team",
+      "copyright": "Copyright © 2025 MindFlow Team",
       "category": "Developer Tool",
       "shortDescription": "A minimalist Markdown editor",
-      "longDescription": "MindFlow is a minimalist Markdown editor with multi-platform support"
+      "longDescription": "MindFlow is a minimalist Markdown editor with multi-platform support. Features include file management, real-time preview, syntax highlighting, and export options.",
+      "icon": ["icons/icon.png"],
+      "macOS": {
+        "minimumSystemVersion": "10.13",
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
+    },
+    "updater": {
+      "active": true,
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmRmbG93IHRhdXJpIHB1YmxpYyBrZXk6IDIwOjU1OjE1OjY5OjY3OjA5OjYwOjU4OjA2OjU3OjI4OjU3OjYwOjk1OjYzOjE5OjYwOjI5Ojg4OjU4OjUwOjQzOjE1OjQ4OjQzOjU4OjI0OjUwOjY4OjI4OjY5OjYxOjU4OjQ5OjU3OjU4Ojk2OjUyOjE2OjY4OjYxOjUwOjYwOjQ1OjU3OjQ1OjY3Ojk1OjY3OjE4OjY4OjI3OjQ1OjY4OjI2OjU3OjU3OjYxOjY4OjU3OjY5OjU0OjE3OjQ4OjUxOjk5OjUxOjQ4OjQxOjU4OjQ1OjY5OjU4OjY4Ojk1Ojg3OjQzOjQ1OjY1OjU1OjQ4OjY4OjY5OjY2OjU3OjI1OjYwOjQ4OjU1OjQ4OjY4OjY1OjQ1OjU1OjY3OjY4OjU4OjQ1OjY3OjUwOjU4OjQ1OjU4OjQzOjQ1OjY4OjY4OjU4OjU0OjQ4OjU4OjQ4OjU3OjY5OjU2OjU3OjY5OjE1OjU1OjU3OjQ5OjY3OjY3OjEwOjY3OjY3OjQ1OjY3OjY3OjQ1OjY3OjY3OjQ1OjY3OjY3OjQ1OjY3OjY3OjQ1OjY3OjY3",
+      "endpoints": [
+        "https://github.com/mindflow/mindflow/releases/latest/download/latest.json"
+      ]
     },
     "security": {
       "csp": null
+    },
+    "systemTray": {
+      "iconPath": "icons/icon_32x32.png",
+      "iconAsTemplate": true
     },
     "windows": [
       {

@@ -26,7 +26,7 @@ export default defineConfig(async () => ({
       output: {
         manualChunks: {
           // 将React相关库打包成单独的chunk
-          'react-vendor': ['react', 'react-dom', 'react-redux'],
+          'react-vendor': ['react', 'react-dom'],
           // 将Redux相关库打包成单独的chunk
           'redux-vendor': ['@reduxjs/toolkit', 'react-redux'],
           // 将编辑器相关库打包成单独的chunk
@@ -46,14 +46,8 @@ export default defineConfig(async () => ({
         assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
-    // 启用压缩
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    // 启用压缩（使用 esbuild）
+    minify: 'esbuild',
     chunkSizeWarningLimit: 1000,
   },
   // 优化依赖预构建

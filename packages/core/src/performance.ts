@@ -6,6 +6,8 @@
  * @license MIT
  */
 
+import React from 'react';
+
 /**
  * 性能指标类型
  */
