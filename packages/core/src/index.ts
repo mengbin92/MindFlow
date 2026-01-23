@@ -68,3 +68,35 @@ export { ExportFormat } from './exporter';
  */
 export { Presenter, presenter } from './presentation';
 export type { PresentationOptions, PresentationState, SlideInfo } from './presentation';
+
+/**
+ * 导出性能监控工具
+ * @description 提供性能指标收集、监控和报告功能
+ */
+export {
+  PerformanceMonitor,
+  performanceMonitor,
+  MeasurePerformance,
+  useRenderPerformance,
+  debounce,
+  throttle,
+  batchUpdates,
+} from './performance';
+export type { PerformanceMetrics, PerformanceMark } from './performance';
+
+/**
+ * 导出内存优化工具
+ * @description 提供内存泄漏检测、资源清理和内存使用优化功能
+ */
+export {
+  MemoryManager,
+  memoryManager,
+  useResourceManager,
+  MemoryLeakDetector,
+  memoryLeakDetector,
+  WeakCache,
+  LRUCache,
+  StringCache,
+  BatchProcessor,
+  ResourceType,
+} from './memory-optimizer';
