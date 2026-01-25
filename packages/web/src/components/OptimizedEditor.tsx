@@ -103,12 +103,12 @@ const OptimizedEditor: React.FC<OptimizedEditorProps> = React.memo(({
   // 预览更新防抖函数（使用useCallback缓存）
   const debouncedUpdatePreview = useMemo(
     () =>
-      debounce(async (newContent: string) => {
+      debounce(async (newContent) => {
         performanceMonitor.mark('preview-update-start');
 
         if (previewRef.current) {
           // 使用 parser 解析 Markdown
-          const html = parser.parse(newContent);
+          const html = parser.parse(newContent as string);
           previewRef.current.innerHTML = html;
 
           // 渲染需要延迟处理的扩展语法（Mermaid、Markmap）
@@ -120,11 +120,11 @@ const OptimizedEditor: React.FC<OptimizedEditorProps> = React.memo(({
         }
 
         // 调用外部回调
-        onChange?.(newContent);
+        onChange?.(newContent as string);
 
         // 触发自动保存
         if (autoSave && autoSaveManagerRef.current) {
-          autoSaveManagerRef.current.updateContent(newContent);
+          autoSaveManagerRef.current.updateContent(newContent as string);
         }
 
         performanceMonitor.endMark('preview-update-start');

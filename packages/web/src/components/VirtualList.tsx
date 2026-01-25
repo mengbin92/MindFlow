@@ -88,7 +88,7 @@ export function VirtualList<T>({
   }, [items.length, itemHeight, itemMetrics]);
 
   // 计算可见范围
-  const { visibleStart, visibleEnd, startIndex } = useMemo(() => {
+  const { visibleStart, visibleEnd } = useMemo(() => {
     if (variableHeight && itemMetrics) {
       // 二分查找找到第一个可见项目
       let left = 0;
@@ -145,8 +145,8 @@ export function VirtualList<T>({
 
   // 处理滚动事件（节流）
   const handleScroll = useCallback(
-    throttle((e: React.UIEvent<HTMLDivElement>) => {
-      setScrollTop(e.currentTarget.scrollTop);
+    throttle((e) => {
+      setScrollTop((e as React.UIEvent<HTMLDivElement>).currentTarget.scrollTop);
     }, 16), // 60fps
     []
   );

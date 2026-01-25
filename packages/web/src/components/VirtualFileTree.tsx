@@ -9,10 +9,10 @@
 import React, { useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
-  selectFile,
+  setSelectedFile,
   toggleFolder,
   createFile,
-  createFolder,
+  createDir,
   deleteFile,
 } from '../store/fileSystemSlice';
 import { VirtualList } from './VirtualList';
@@ -49,7 +49,7 @@ const FileTreeNode = React.memo<FileTreeNodeProps>(
       if (node.type === 'folder') {
         dispatch(toggleFolder(node.path));
       } else {
-        dispatch(selectFile(node.path));
+        dispatch(setSelectedFile(node.path));
       }
     }, [dispatch, node]);
 
@@ -128,7 +128,10 @@ export const VirtualFileTree: React.FC<VirtualFileTreeProps> = ({
 
   // 将文件树扁平化用于虚拟滚动
   const flattenedNodes = useMemo(() => {
-    return flattenFileTree(fileTree);
+    if (!fileTree || !fileTree.children) {
+      return [];
+    }
+    return flattenFileTree(fileTree.children as unknown as FileNode[]);
   }, [fileTree]);
 
   // 渲染单个节点
@@ -156,7 +159,7 @@ export const VirtualFileTree: React.FC<VirtualFileTreeProps> = ({
   const handleCreateFolder = useCallback(() => {
     const name = prompt('请输入文件夹名：');
     if (name) {
-      dispatch(createFolder(name));
+      dispatch(createDir(name));
     }
   }, [dispatch]);
 
