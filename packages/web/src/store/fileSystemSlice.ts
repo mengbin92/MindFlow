@@ -7,6 +7,88 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import type { FileTreeNode, FileOperationState, SearchResult } from '@mindflow/types';
 import * as fsAdapter from './webFileSystemAdapter';
 
+/**
+ * 辅助函数：将节点添加到文件树
+ * @description 根据节点的路径，将其添加到正确的父节点中，如果父节点不存在则自动创建
+ */
+function addNodeToFileTree(root: FileTreeNode, node: FileTreeNode): void {
+  // 如果节点在根目录（没有父文件夹）
+  if (!node.path.includes('/') || node.path.split('/').length === 1) {
+    // 添加到根节点的children
+    if (!root.children) {
+      root.children = [];
+    }
+    // 检查是否已存在
+    if (!root.children.find(child => child.path === node.path)) {
+      root.children.push(node);
+    }
+    return;
+  }
+
+  // 节点在子目录中
+  const pathParts = node.path.split('/');
+  const parentPath = pathParts.slice(0, -1).join('/');
+
+  // 递归查找或创建父节点
+  function findOrCreateAndAdd(currentNode: FileTreeNode, targetPath: string): boolean {
+    if (currentNode.path === targetPath) {
+      // 找到父节点
+      if (!currentNode.children) {
+        currentNode.children = [];
+      }
+      // 检查是否已存在
+      if (!currentNode.children.find(child => child.path === node.path)) {
+        currentNode.children.push(node);
+      }
+      return true;
+    }
+
+    // 检查是否需要创建中间目录
+    if (targetPath.startsWith(currentNode.path + '/')) {
+      // 提取下一级路径
+      const remainingPath = targetPath.substring(currentNode.path ? currentNode.path.length + 1 : 0);
+      const nextPathPart = remainingPath.split('/')[0];
+      const nextPath = currentNode.path ? `${currentNode.path}/${nextPathPart}` : nextPathPart;
+
+      if (!currentNode.children) {
+        currentNode.children = [];
+      }
+
+      // 查找下一级节点
+      let nextNode = currentNode.children.find(child => child.path === nextPath);
+
+      // 如果下一级节点不存在，创建它（作为文件夹）
+      if (!nextNode) {
+        nextNode = {
+          id: nextPath,
+          name: nextPathPart,
+          path: nextPath,
+          isDir: true,
+          modifiedTime: Date.now() / 1000,
+          children: [],
+        };
+        currentNode.children.push(nextNode);
+      }
+
+      // 递归处理
+      return findOrCreateAndAdd(nextNode, targetPath);
+    }
+
+    // 递归搜索子节点
+    if (currentNode.children) {
+      for (const child of currentNode.children) {
+        if (child.isDir && findOrCreateAndAdd(child, targetPath)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  findOrCreateAndAdd(root, parentPath);
+}
+
 // ==================== 状态接口 ====================
 
 interface FileSystemState {
@@ -266,7 +348,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(readFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
 
         // 更新文件内容
         const { path, content } = action.payload;
@@ -288,7 +370,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(writeFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
 
         // 更新文件内容
         const { path, content } = action.payload;
@@ -310,13 +392,49 @@ const fileSystemSlice = createSlice({
       })
       .addCase(getFileTree.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
         state.currentDirectory = action.payload.path;
         state.fileTree = action.payload.fileTree;
       })
       .addCase(getFileTree.rejected, (state, action) => {
         state.operationState.isLoading = false;
         state.operationState.error = action.error.message || 'Failed to get file tree';
+      });
+
+    // createFile
+    builder
+      .addCase(createFile.fulfilled, (state, action) => {
+        state.operationState.isLoading = false;
+        state.operationState.error = null;
+        state.operationState.lastOperation = Date.now();
+
+        // 将新创建的文件添加到文件树
+        const newFile = action.payload;
+        if (state.fileTree && newFile) {
+          addNodeToFileTree(state.fileTree, newFile);
+        }
+      })
+      .addCase(createFile.rejected, (state, action) => {
+        state.operationState.isLoading = false;
+        state.operationState.error = action.error.message || 'Failed to create file';
+      });
+
+    // createDir
+    builder
+      .addCase(createDir.fulfilled, (state, action) => {
+        state.operationState.isLoading = false;
+        state.operationState.error = null;
+        state.operationState.lastOperation = Date.now();
+
+        // 将新创建的文件夹添加到文件树
+        const newDir = action.payload;
+        if (state.fileTree && newDir) {
+          addNodeToFileTree(state.fileTree, newDir);
+        }
+      })
+      .addCase(createDir.rejected, (state, action) => {
+        state.operationState.isLoading = false;
+        state.operationState.error = action.error.message || 'Failed to create directory';
       });
 
     // searchFiles

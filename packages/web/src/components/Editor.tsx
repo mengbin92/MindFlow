@@ -161,6 +161,7 @@ const Editor: React.FC<EditorProps> = ({
       const savedContent = autoSaveManagerRef.current.loadFromStorage();
       if (savedContent && savedContent !== initialValue) {
         editor.setContent(savedContent);
+        setContent(savedContent); // 更新content state
         setLastSavedTime(autoSaveManagerRef.current.getLastSavedTimeString());
       }
     }
@@ -209,6 +210,37 @@ const Editor: React.FC<EditorProps> = ({
       editor.destroy();
     };
   }, []);
+
+  /**
+   * 监听initialContent变化，更新编辑器内容
+   */
+  useEffect(() => {
+    if (!editorControllerRef.current || !initialValue) return;
+
+    // 当initialContent改变时，更新编辑器内容和预览
+    const newContent = initialValue;
+    setContent(newContent);
+    editorControllerRef.current.setContent(newContent);
+    updatePreview(newContent);
+
+    // 重置自动保存管理器
+    if (autoSave && docId && autoSaveManagerRef.current) {
+      autoSaveManagerRef.current.destroy();
+      autoSaveManagerRef.current = new LocalStorageAutoSaveManager(docId, {
+        delay: autoSaveDelay,
+        enabled: true,
+        onSaveStateChange: (state: SaveState) => {
+          setSaveState(state);
+          onSaveStateChange?.(state);
+
+          // 更新最后保存时间显示
+          if (state === SaveState.Saved && autoSaveManagerRef.current) {
+            setLastSavedTime(autoSaveManagerRef.current.getLastSavedTimeString());
+          }
+        },
+      });
+    }
+  }, [initialValue, docId, autoSave, autoSaveDelay]);
 
   /**
    * 处理主题切换

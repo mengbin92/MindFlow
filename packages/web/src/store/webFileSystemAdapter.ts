@@ -119,14 +119,46 @@ export async function writeFile(path: string, content: string): Promise<void> {
  */
 export async function createFile(path: string): Promise<FileTreeNode> {
   const name = path.split('/').pop() || path;
-  return {
+
+  // 检查文件是否已存在
+  const existingContent = localStorage.getItem(`file:${path}`);
+  if (existingContent !== null) {
+    throw new Error(`File already exists: ${path}`);
+  }
+
+  // 如果文件在子目录中，自动创建父目录
+  const pathParts = path.split('/');
+  if (pathParts.length > 1) {
+    const parentPath = pathParts.slice(0, -1).join('/');
+
+    // 递归创建父目录
+    let currentPath = '';
+    for (const part of pathParts.slice(0, -1)) {
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+
+      // 检查目录是否已存在
+      const dirKey = `dir:${currentPath}`;
+      if (!localStorage.getItem(dirKey)) {
+        localStorage.setItem(dirKey, JSON.stringify([]));
+      }
+    }
+  }
+
+  // 创建空文件并保存到localStorage
+  const emptyContent = '';
+  localStorage.setItem(`file:${path}`, emptyContent);
+
+  // 创建文件节点
+  const fileNode: FileTreeNode = {
     id: path,
     name,
     path,
     isDir: false,
     modifiedTime: Date.now() / 1000,
-    content: '',
+    content: emptyContent,
   };
+
+  return fileNode;
 }
 
 /**
@@ -134,7 +166,18 @@ export async function createFile(path: string): Promise<FileTreeNode> {
  */
 export async function createDir(path: string): Promise<FileTreeNode> {
   const name = path.split('/').pop() || path;
-  return {
+
+  // 检查文件夹是否已存在
+  const existingDir = localStorage.getItem(`dir:${path}`);
+  if (existingDir !== null) {
+    throw new Error(`Directory already exists: ${path}`);
+  }
+
+  // 创建文件夹并保存到localStorage（保存为空数组）
+  localStorage.setItem(`dir:${path}`, JSON.stringify([]));
+
+  // 创建文件夹节点
+  const dirNode: FileTreeNode = {
     id: path,
     name,
     path,
@@ -142,6 +185,8 @@ export async function createDir(path: string): Promise<FileTreeNode> {
     modifiedTime: Date.now() / 1000,
     children: [],
   };
+
+  return dirNode;
 }
 
 /**
@@ -189,52 +234,164 @@ export async function readDirectory(path: string): Promise<FileTreeNode[]> {
  * 获取完整文件树
  */
 export async function getFileTree(path: string): Promise<FileTreeNode> {
-  // Web端使用默认的演示文件树
-  if (typeof window !== 'undefined' && window.showDirectoryPicker) {
-    try {
-      const dirHandle = await window.showDirectoryPicker();
-      return buildFileTree(dirHandle, path);
-    } catch (err) {
-      // 用户取消或API不支持
-      console.warn('Directory picker not available or cancelled:', err);
+  // Web版直接从localStorage构建文件树
+  const fileTree = await buildFileTreeFromLocalStorage();
+  return fileTree;
+}
+
+/**
+ * 从localStorage构建文件树
+ * @description 扫描localStorage中的所有文件和文件夹，构建完整的文件树
+ */
+async function buildFileTreeFromLocalStorage(): Promise<FileTreeNode> {
+  const files: Map<string, FileTreeNode> = new Map();
+  const dirs: Map<string, FileTreeNode> = new Map();
+
+  // 扫描localStorage中的所有文件和文件夹
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+
+    if (key.startsWith('file:')) {
+      // 文件
+      const filePath = key.replace('file:', '');
+      const content = localStorage.getItem(key) || '';
+
+      const name = filePath.split('/').pop() || filePath;
+      const fileNode: FileTreeNode = {
+        id: filePath,
+        name,
+        path: filePath,
+        isDir: false,
+        modifiedTime: Date.now() / 1000,
+        content,
+      };
+
+      files.set(filePath, fileNode);
+    } else if (key.startsWith('dir:')) {
+      // 文件夹
+      const dirPath = key.replace('dir:', '');
+      const name = dirPath.split('/').pop() || dirPath;
+
+      const dirNode: FileTreeNode = {
+        id: dirPath,
+        name,
+        path: dirPath,
+        isDir: true,
+        modifiedTime: Date.now() / 1000,
+        children: [],
+      };
+
+      dirs.set(dirPath, dirNode);
     }
   }
 
-  // 返回默认的演示文件树
-  return {
+  // 如果没有任何文件，返回默认的演示文件树
+  if (files.size === 0 && dirs.size === 0) {
+    return {
+      id: 'root',
+      name: 'MindFlow',
+      path: '',
+      isDir: true,
+      modifiedTime: Date.now() / 1000,
+      children: [
+        {
+          id: 'welcome',
+          name: 'Welcome.md',
+          path: 'Welcome.md',
+          isDir: false,
+          modifiedTime: Date.now() / 1000,
+          content: '# Welcome to MindFlow\n\nThis is a minimalist Markdown editor.',
+        },
+        {
+          id: 'docs',
+          name: 'docs',
+          path: 'docs',
+          isDir: true,
+          modifiedTime: Date.now() / 1000,
+          children: [
+            {
+              id: 'docs/guide',
+              name: 'guide.md',
+              path: 'docs/guide.md',
+              isDir: false,
+              modifiedTime: Date.now() / 1000,
+              content: '# Guide\n\nDocumentation goes here.',
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  // 构建文件树结构
+  const root: FileTreeNode = {
     id: 'root',
     name: 'MindFlow',
     path: '',
     isDir: true,
     modifiedTime: Date.now() / 1000,
-    children: [
-      {
-        id: 'welcome',
-        name: 'Welcome.md',
-        path: 'Welcome.md',
-        isDir: false,
-        modifiedTime: Date.now() / 1000,
-        content: '# Welcome to MindFlow\n\nThis is a minimalist Markdown editor.',
-      },
-      {
-        id: 'docs',
-        name: 'docs',
-        path: 'docs',
-        isDir: true,
-        modifiedTime: Date.now() / 1000,
-        children: [
-          {
-            id: 'docs/guide',
-            name: 'guide.md',
-            path: 'docs/guide.md',
-            isDir: false,
-            modifiedTime: Date.now() / 1000,
-            content: '# Guide\n\nDocumentation goes here.',
-          },
-        ],
-      },
-    ],
+    children: [],
   };
+
+  // 将所有节点添加到根节点
+  const allNodes = new Map([...files, ...dirs]);
+
+  // 按路径深度排序，确保父节点先被处理
+  const sortedPaths = Array.from(allNodes.keys()).sort((a, b) => {
+    const aDepth = a.split('/').length;
+    const bDepth = b.split('/').length;
+    return aDepth - bDepth;
+  });
+
+  // 构建树结构
+  for (const nodePath of sortedPaths) {
+    const node = allNodes.get(nodePath)!;
+
+    // 如果是根级文件或文件夹，直接添加到根节点
+    if (!nodePath.includes('/')) {
+      if (!root.children) {
+        root.children = [];
+      }
+      root.children.push(node);
+    } else {
+      // 找到父节点并添加
+      const parentPath = nodePath.substring(0, nodePath.lastIndexOf('/'));
+      const parent = dirs.get(parentPath);
+
+      if (parent) {
+        if (!parent.children) {
+          parent.children = [];
+        }
+        // 检查是否已存在
+        if (!parent.children.find(child => child.path === nodePath)) {
+          parent.children.push(node);
+        }
+      }
+    }
+  }
+
+  // 对children进行排序（文件夹在前，文件在后，按字母排序）
+  function sortChildren(node: FileTreeNode) {
+    if (node.children) {
+      node.children.sort((a, b) => {
+        if (a.isDir && !b.isDir) return -1;
+        if (!a.isDir && b.isDir) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      // 递归排序子节点
+      node.children.forEach(child => {
+        if (child.isDir) {
+          sortChildren(child);
+        }
+      });
+    }
+  }
+
+  sortChildren(root);
+
+  return root;
 }
 
 /**

@@ -141,8 +141,8 @@ export interface FileOperationState {
   /** 错误信息 */
   error: string | null;
 
-  /** 最后操作时间 */
-  lastOperation: Date | null;
+  /** 最后操作时间（时间戳） */
+  lastOperation: number | null;
 }
 
 /**

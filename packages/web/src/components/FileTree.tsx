@@ -11,6 +11,8 @@ import {
   setSelectedFile,
   openFile,
   getFileTree,
+  createFile,
+  createDir,
 } from '../store/fileSystemSlice';
 import './FileTree.css';
 
@@ -43,10 +45,14 @@ const FileTreeNodeComponent: React.FC<FileTreeNodeProps> = ({ node, level, path 
 
     setIsLoading(true);
     try {
-      // 打开文件
+      // 从localStorage加载文件内容
+      const content = localStorage.getItem(`file:${nodePath}`);
+
+      // 打开文件（包含最新内容）
       dispatch(openFile({
         ...node,
         path: nodePath,
+        content: content || '',
       }));
     } finally {
       setIsLoading(false);
@@ -125,24 +131,99 @@ export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
   const fileTree = useAppSelector(state => state.fileSystem.fileTree);
   const isLoading = useAppSelector(state => state.fileSystem.operationState.isLoading);
 
-  // 处理打开目录
-  const handleOpenDirectory = () => {
+  // 新建文件/文件夹的状态
+  const [showNewFileDialog, setShowNewFileDialog] = useState(false);
+  const [showNewDirDialog, setShowNewDirDialog] = useState(false);
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemPath, setNewItemPath] = useState('');
+
+  // 处理刷新文件树
+  const handleRefresh = () => {
     dispatch(getFileTree(''));
   };
 
-  // 空状态 - 显示打开目录按钮
+  // 处理新建文件
+  const handleNewFile = () => {
+    setNewItemPath('');
+    setNewItemName('');
+    setShowNewFileDialog(true);
+  };
+
+  // 处理新建文件夹
+  const handleNewDir = () => {
+    setNewItemPath('');
+    setNewItemName('');
+    setShowNewDirDialog(true);
+  };
+
+  // 确认新建文件
+  const handleConfirmNewFile = () => {
+    if (!newItemName.trim()) return;
+
+    const path = newItemPath ? `${newItemPath}/${newItemName}` : newItemName;
+
+    dispatch(createFile(path))
+      .unwrap()
+      .then(() => {
+        setShowNewFileDialog(false);
+        setNewItemName('');
+        // Redux reducer会自动更新文件树
+      })
+      .catch((error: Error) => {
+        console.error('Failed to create file:', error);
+        alert(`创建文件失败: ${error.message}`);
+      });
+  };
+
+  // 确认新建文件夹
+  const handleConfirmNewDir = () => {
+    if (!newItemName.trim()) return;
+
+    const path = newItemPath ? `${newItemPath}/${newItemName}` : newItemName;
+
+    dispatch(createDir(path))
+      .unwrap()
+      .then(() => {
+        setShowNewDirDialog(false);
+        setNewItemName('');
+        // Redux reducer会自动更新文件树
+      })
+      .catch((error: Error) => {
+        console.error('Failed to create directory:', error);
+        alert(`创建文件夹失败: ${error.message}`);
+      });
+  };
+
+  // 取消新建
+  const handleCancelNew = () => {
+    setShowNewFileDialog(false);
+    setShowNewDirDialog(false);
+    setNewItemName('');
+    setNewItemPath('');
+  };
+
+  // 处理回车键确认
+  const handleKeyPress = (e: React.KeyboardEvent, isDir: boolean) => {
+    if (e.key === 'Enter') {
+      if (isDir) {
+        handleConfirmNewDir();
+      } else {
+        handleConfirmNewFile();
+      }
+    } else if (e.key === 'Escape') {
+      handleCancelNew();
+    }
+  };
+
+  // 空状态 - 自动加载或显示刷新按钮
   if (!fileTree) {
+    // 自动加载localStorage中的文件树
+    dispatch(getFileTree(''));
+
     return (
       <div className={`file-tree file-tree-empty ${className}`}>
         <div className="file-tree-empty-message">
-          <p>No directory selected</p>
-          <button
-            className="open-directory-button"
-            onClick={handleOpenDirectory}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Opening...' : '📂 Open Directory'}
-          </button>
+          <p>加载中...</p>
         </div>
       </div>
     );
@@ -150,12 +231,106 @@ export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
 
   return (
     <div className={`file-tree ${className}`}>
+      {/* 文件树工具栏 */}
+      <div className="file-tree-toolbar">
+        <button
+          className="toolbar-button"
+          onClick={handleNewFile}
+          title="新建文件"
+        >
+          📄 新建文件
+        </button>
+        <button
+          className="toolbar-button"
+          onClick={handleNewDir}
+          title="新建文件夹"
+        >
+          📁 新建文件夹
+        </button>
+        <button
+          className="toolbar-button"
+          onClick={handleRefresh}
+          title="刷新文件树"
+        >
+          🔄 刷新
+        </button>
+      </div>
+
       {/* 文件树根节点 */}
       <FileTreeNodeComponent
         node={fileTree}
         level={0}
         path=""
       />
+
+      {/* 新建文件对话框 */}
+      {showNewFileDialog && (
+        <div className="file-tree-dialog-overlay" onClick={handleCancelNew}>
+          <div className="file-tree-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3>新建文件</h3>
+            <input
+              type="text"
+              className="file-tree-input"
+              placeholder="输入文件名（如: test.md）或路径（如: docs/test.md）"
+              value={newItemName}
+              onChange={(e) => setNewItemName(e.target.value)}
+              onKeyDown={(e) => handleKeyPress(e, false)}
+              autoFocus
+            />
+            <div className="file-tree-dialog-hint">
+              提示：创建子目录文件需先创建文件夹，然后输入完整路径（例如: docs/test.md）
+            </div>
+            <div className="file-tree-dialog-buttons">
+              <button
+                className="dialog-button primary"
+                onClick={handleConfirmNewFile}
+                disabled={!newItemName.trim()}
+              >
+                创建
+              </button>
+              <button
+                className="dialog-button"
+                onClick={handleCancelNew}
+              >
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 新建文件夹对话框 */}
+      {showNewDirDialog && (
+        <div className="file-tree-dialog-overlay" onClick={handleCancelNew}>
+          <div className="file-tree-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3>新建文件夹</h3>
+            <input
+              type="text"
+              className="file-tree-input"
+              placeholder="输入文件夹名，例如: docs"
+              value={newItemName}
+              onChange={(e) => setNewItemName(e.target.value)}
+              onKeyDown={(e) => handleKeyPress(e, true)}
+              autoFocus
+            />
+            <div className="file-tree-dialog-buttons">
+              <button
+                className="dialog-button primary"
+                onClick={handleConfirmNewDir}
+                disabled={!newItemName.trim()}
+              >
+                创建
+              </button>
+              <button
+                className="dialog-button"
+                onClick={handleCancelNew}
+              >
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

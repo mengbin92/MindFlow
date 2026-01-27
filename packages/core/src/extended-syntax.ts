@@ -10,9 +10,21 @@
 import katex from 'katex';
 import mermaid from 'mermaid';
 
-// Type declaration for plantuml-encoder (inline)
-// @ts-ignore
-const encode = require('plantuml-encoder');
+// PlantUML编码器（可选，动态导入）
+let plantumlEncoder: any = null;
+
+// 尝试动态加载plantuml-encoder（仅在需要时）
+async function loadPlantUMLEncoder(): Promise<boolean> {
+  try {
+    if (!plantumlEncoder) {
+      plantumlEncoder = await import('plantuml-encoder');
+    }
+    return true;
+  } catch (error) {
+    console.warn('PlantUML encoder not available:', error);
+    return false;
+  }
+}
 
 /**
  * 扩展语法类型
@@ -218,11 +230,27 @@ export class ExtendedSyntaxProcessor {
    * @param code - PlantUML 代码
    * @returns HTML 字符串
    */
-  processPlantUML(code: string): string {
+  async processPlantUML(code: string): Promise<string> {
     try {
-      const encoded = encode(code);
-      const url = `https://www.plantuml.com/plantuml/svg/${encoded}`;
-      return `<img src="${url}" alt="PlantUML Diagram" class="plantuml-diagram" />`;
+      // 尝试加载并使用PlantUML编码器
+      const hasEncoder = await loadPlantUMLEncoder();
+
+      if (hasEncoder && plantumlEncoder && typeof plantumlEncoder.encode === 'function') {
+        const encoded = plantumlEncoder.encode(code);
+        const url = `https://www.plantuml.com/plantuml/svg/${encoded}`;
+        return `<img src="${url}" alt="PlantUML Diagram" class="plantuml-diagram" />`;
+      } else {
+        // 如果编码器不可用，使用在线服务的URL编码方式
+        // 注意：这种方式可能不适用于所有PlantUML图表
+        const encoded = btoa(unescape(encodeURIComponent(code)));
+        return `<div class="plantuml-info">
+          <p>PlantUML图表（编码器不可用，使用备用方案）</p>
+          <pre>${this.escapeHtml(code)}</pre>
+          <a href="https://www.plantuml.com/plantuml/uml/${encoded}" target="_blank" rel="noopener noreferrer">
+            在新窗口中查看
+          </a>
+        </div>`;
+      }
     } catch (error) {
       return `<div class="plantuml-error">PlantUML Error: ${error instanceof Error ? error.message : 'Unknown error'}</div>`;
     }
@@ -258,16 +286,17 @@ export class ExtendedSyntaxProcessor {
       return this.processMarkmap(code.trim(), id);
     });
 
-    // 处理 PlantUML 图表
+    // 处理 PlantUML 图表（暂时使用占位符，异步处理）
     html = html.replace(/```(?:plantuml|puml)\n([\s\S]+?)```/g, (_match, code) => {
-      return this.processPlantUML(code.trim());
+      const id = `plantuml-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      return `<div class="plantuml-placeholder" data-plantuml-id="${id}" data-plantuml-code="${this.escapeHtml(code.trim())}">Loading PlantUML...</div>`;
     });
 
     return html;
   }
 
   /**
-   * 渲染需要延迟处理的扩展语法（Mermaid）
+   * 渲染需要延迟处理的扩展语法（Mermaid 和 PlantUML）
    * @param container - 包含扩展语法元素的容器
    */
   async renderExtendedSyntax(container: HTMLElement): Promise<void> {
@@ -276,6 +305,20 @@ export class ExtendedSyntaxProcessor {
     for (const element of mermaidElements) {
       if (element instanceof HTMLElement) {
         await this.renderMermaid(element);
+      }
+    }
+
+    // 渲染所有 PlantUML 图表
+    const plantumlElements = container.querySelectorAll('div.plantuml-placeholder');
+    for (const element of plantumlElements) {
+      if (element instanceof HTMLElement) {
+        const code = element.getAttribute('data-plantuml-code') || '';
+        try {
+          const html = await this.processPlantUML(code);
+          element.outerHTML = html;
+        } catch (error) {
+          element.outerHTML = `<div class="plantuml-error">Failed to render PlantUML: ${error instanceof Error ? error.message : 'Unknown error'}</div>`;
+        }
       }
     }
 

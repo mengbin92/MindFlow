@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Marked Test</title>
+</head>
+<body>
+    <h1>Marked.js Test</h1>
+    <div id="output"></div>
+
+    <script type="module">
+        import { marked } from 'marked';
+
+        const markdown = '# Hello\n\nThis is **bold** text.';
+
+        try {
+            console.log('Testing marked.parse...');
+            console.log('Markdown:', markdown);
+            console.log('Marked version:', marked.version);
+
+            const result = marked.parse(markdown);
+            console.log('Result type:', typeof result);
+            console.log('Result:', result);
+
+            if (result instanceof Promise) {
+                result.then(html => {
+                    console.log('Async HTML:', html);
+                    document.getElementById('output').innerHTML = html;
+                }).catch(err => {
+                    console.error('Async error:', err);
+                    document.getElementById('output').innerHTML = `<p style="color: red">Error: ${err.message}</p>`;
+                });
+            } else {
+                console.log('Sync HTML:', result);
+                document.getElementById('output').innerHTML = result;
+            }
+        } catch (error) {
+            console.error('Test error:', error);
+            document.getElementById('output').innerHTML = `<p style="color: red">Error: ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html>

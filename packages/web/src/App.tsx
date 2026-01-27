@@ -13,6 +13,7 @@ import { FileTree } from './components/FileTree';
 import { FileList } from './components/FileList';
 import { SearchBar } from './components/SearchBar';
 import { store } from './store';
+import { useAppSelector } from './store/hooks';
 import './App.css';
 
 /**
@@ -21,6 +22,9 @@ import './App.css';
 function AppContent(): JSX.Element {
   // 当前主题状态
   const [currentTheme, setCurrentTheme] = React.useState<'light' | 'dark'>('light');
+
+  // 获取当前打开的文件
+  const currentFile = useAppSelector(state => state.fileSystem.currentFile);
 
   useEffect(() => {
     // 从localStorage读取主题
@@ -82,6 +86,8 @@ function AppContent(): JSX.Element {
         {/* 编辑器 */}
         <div className="editor-container">
           <Editor
+            initialContent={currentFile?.content}
+            docId={currentFile?.path || 'default'}
             theme={currentTheme}
             onChange={() => {}}
             onThemeChange={handleThemeChange}

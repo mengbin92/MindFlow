@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>Test Page</h1>
+    <div id="root">Loading...</div>
+    <script>
+        // Test if JavaScript is working
+        console.log('JavaScript is working');
+        document.getElementById('root').innerHTML = 'JavaScript is working!';
+
+        // Test if we can fetch the main.tsx
+        fetch('/src/main.tsx')
+            .then(response => {
+                console.log('main.tsx response status:', response.status);
+                document.getElementById('root').innerHTML += '<br>main.tsx is accessible';
+            })
+            .catch(error => {
+                console.error('Error fetching main.tsx:', error);
+                document.getElementById('root').innerHTML += '<br>Error fetching main.tsx: ' + error.message;
+            });
+
+        // Check if React is available
+        setTimeout(() => {
+            const scripts = document.querySelectorAll('script');
+            document.getElementById('root').innerHTML += '<br>Script tags found: ' + scripts.length;
+        }, 1000);
+    </script>
+</body>
+</html>
