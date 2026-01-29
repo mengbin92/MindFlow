@@ -129,7 +129,9 @@ interface FileTreeProps {
 export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
   const dispatch = useAppDispatch();
   const fileTree = useAppSelector(state => state.fileSystem.fileTree);
-  const isLoading = useAppSelector(state => state.fileSystem.operationState.isLoading);
+  const selectedFile = useAppSelector(state => state.fileSystem.selectedFile);
+  // 文件系统操作状态（保留用于未来扩展）
+  useAppSelector(state => state.fileSystem.operationState.isLoading);
 
   // 新建文件/文件夹的状态
   const [showNewFileDialog, setShowNewFileDialog] = useState(false);
@@ -142,16 +144,45 @@ export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
     dispatch(getFileTree(''));
   };
 
+  // 获取当前选中的文件夹路径
+  const getSelectedFolderPath = (): string => {
+    if (!selectedFile) return '';
+    // 如果选中的是文件夹，返回该路径
+    // 如果选中的是文件，返回其所在目录
+    const node = findNodeByPath(fileTree, selectedFile);
+    if (node?.isDir) {
+      return selectedFile;
+    }
+    // 获取父目录
+    const lastSlashIndex = selectedFile.lastIndexOf('/');
+    return lastSlashIndex > 0 ? selectedFile.substring(0, lastSlashIndex) : '';
+  };
+
+  // 根据路径查找节点
+  const findNodeByPath = (root: FileTreeNode | null, path: string): FileTreeNode | null => {
+    if (!root) return null;
+    if (root.path === path) return root;
+    if (root.children) {
+      for (const child of root.children) {
+        const found = findNodeByPath(child, path);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
   // 处理新建文件
   const handleNewFile = () => {
-    setNewItemPath('');
+    const folderPath = getSelectedFolderPath();
+    setNewItemPath(folderPath);
     setNewItemName('');
     setShowNewFileDialog(true);
   };
 
   // 处理新建文件夹
   const handleNewDir = () => {
-    setNewItemPath('');
+    const folderPath = getSelectedFolderPath();
+    setNewItemPath(folderPath);
     setNewItemName('');
     setShowNewDirDialog(true);
   };
@@ -268,17 +299,24 @@ export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
         <div className="file-tree-dialog-overlay" onClick={handleCancelNew}>
           <div className="file-tree-dialog" onClick={(e) => e.stopPropagation()}>
             <h3>新建文件</h3>
+            {newItemPath && (
+              <div className="file-tree-dialog-path">
+                📁 {newItemPath}/
+              </div>
+            )}
             <input
               type="text"
               className="file-tree-input"
-              placeholder="输入文件名（如: test.md）或路径（如: docs/test.md）"
+              placeholder="输入文件名（如: test.md）"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               onKeyDown={(e) => handleKeyPress(e, false)}
               autoFocus
             />
             <div className="file-tree-dialog-hint">
-              提示：创建子目录文件需先创建文件夹，然后输入完整路径（例如: docs/test.md）
+              {newItemPath
+                ? `文件将创建在 ${newItemPath}/ 目录下`
+                : '文件将创建在根目录下'}
             </div>
             <div className="file-tree-dialog-buttons">
               <button
@@ -304,15 +342,25 @@ export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
         <div className="file-tree-dialog-overlay" onClick={handleCancelNew}>
           <div className="file-tree-dialog" onClick={(e) => e.stopPropagation()}>
             <h3>新建文件夹</h3>
+            {newItemPath && (
+              <div className="file-tree-dialog-path">
+                📁 {newItemPath}/
+              </div>
+            )}
             <input
               type="text"
               className="file-tree-input"
-              placeholder="输入文件夹名，例如: docs"
+              placeholder="输入文件夹名（如: docs）"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               onKeyDown={(e) => handleKeyPress(e, true)}
               autoFocus
             />
+            <div className="file-tree-dialog-hint">
+              {newItemPath
+                ? `文件夹将创建在 ${newItemPath}/ 目录下`
+                : '文件夹将创建在根目录下'}
+            </div>
             <div className="file-tree-dialog-buttons">
               <button
                 className="dialog-button primary"
