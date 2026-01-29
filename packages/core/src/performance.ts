@@ -233,7 +233,7 @@ export class PerformanceMonitor {
       try {
         performance.clearMarks();
         performance.clearMeasures();
-      } catch (e) {
+      } catch {
         // 忽略错误
       }
     }

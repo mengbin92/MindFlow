@@ -36,63 +36,6 @@ declare global {
   }
 }
 
-// ==================== 工具函数 ====================
-
-/**
- * 将FileSystemHandle转换为FileTreeNode
- */
-async function handleToFileTreeNode(
-  handle: FileSystemHandle,
-  _path: string
-): Promise<FileTreeNode> {
-  const file = await ((handle as unknown) as FileSystemFileHandle).getFile();
-  return {
-    id: _path,
-    name: handle.name,
-    path: _path,
-    isDir: false,
-    size: file.size,
-    modifiedTime: file.lastModified ? Math.floor(file.lastModified / 1000) : Date.now() / 1000,
-    content: await file.text(),
-  };
-}
-
-/**
- * 递归构建文件树
- */
-async function buildFileTree(
-  dirHandle: FileSystemDirectoryHandle,
-  path: string = ''
-): Promise<FileTreeNode> {
-  const children: FileTreeNode[] = [];
-
-  for await (const [name, handle] of dirHandle.entries()) {
-    const fullPath = path ? `${path}/${name}` : name;
-
-    if (handle.kind === 'directory') {
-      children.push(await buildFileTree(((handle as unknown) as FileSystemDirectoryHandle), fullPath));
-    } else {
-      children.push(await handleToFileTreeNode(handle, fullPath));
-    }
-  }
-
-  // 排序：目录在前，文件在后
-  children.sort((a, b) => {
-    if (a.isDir && !b.isDir) return -1;
-    if (!a.isDir && b.isDir) return 1;
-    return a.name.localeCompare(b.name);
-  });
-
-  return {
-    id: path || 'root',
-    name: dirHandle.name,
-    path: path || '',
-    isDir: true,
-    modifiedTime: Date.now() / 1000,
-    children,
-  };
-}
-
 // ==================== API函数 ====================
 
 /**
@@ -129,9 +72,7 @@ export async function createFile(path: string): Promise<FileTreeNode> {
   // 如果文件在子目录中，自动创建父目录
   const pathParts = path.split('/');
   if (pathParts.length > 1) {
-    const parentPath = pathParts.slice(0, -1).join('/');
-
-    // 递归创建父目录
+    // 递归创建父目录（pathParts用于构建目录路径）
     let currentPath = '';
     for (const part of pathParts.slice(0, -1)) {
       currentPath = currentPath ? `${currentPath}/${part}` : part;
@@ -233,7 +174,7 @@ export async function readDirectory(path: string): Promise<FileTreeNode[]> {
 /**
  * 获取完整文件树
  */
-export async function getFileTree(path: string): Promise<FileTreeNode> {
+export async function getFileTree(_path: string): Promise<FileTreeNode> {
   // Web版直接从localStorage构建文件树
   const fileTree = await buildFileTreeFromLocalStorage();
   return fileTree;

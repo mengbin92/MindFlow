@@ -86,7 +86,7 @@ function AppContent(): JSX.Element {
         {/* 编辑器 */}
         <div className="editor-container">
           <Editor
-            initialContent={currentFile?.content}
+            initialValue={currentFile?.content}
             docId={currentFile?.path || 'default'}
             theme={currentTheme}
             onChange={() => {}}

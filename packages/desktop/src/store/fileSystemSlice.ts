@@ -256,7 +256,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(readFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
 
         // 更新文件内容
         const { path, content } = action.payload;
@@ -278,7 +278,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(writeFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
 
         // 更新文件内容
         const { path, content } = action.payload;
@@ -300,7 +300,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(getFileTree.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
         state.currentDirectory = action.payload.path;
         state.fileTree = action.payload.fileTree;
       })
@@ -317,7 +317,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(createFile.fulfilled, (state) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
       })
       .addCase(createFile.rejected, (state, action) => {
         state.operationState.isLoading = false;
@@ -332,7 +332,7 @@ const fileSystemSlice = createSlice({
       })
       .addCase(createDir.fulfilled, (state) => {
         state.operationState.isLoading = false;
-        state.operationState.lastOperation = new Date();
+        state.operationState.lastOperation = Date.now();
       })
       .addCase(createDir.rejected, (state, action) => {
         state.operationState.isLoading = false;

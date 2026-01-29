@@ -209,7 +209,7 @@ export class ExtendedSyntaxProcessor {
             const transformer = new Transformer();
             const { root } = transformer.transform(\`${encodedContent}\`);
             Markmap.create("#markmap", null, root);
-          <\/script>
+          </script>
         </body>
         </html>'
       ></iframe>

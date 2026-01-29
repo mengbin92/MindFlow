@@ -52,7 +52,7 @@ export default defineConfig({
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.') || [];
-          let extType = info[info.length - 1];
+          const extType = info[info.length - 1];
           // CSS 文件
           if (extType === 'css') {
             return 'assets/css/[name]-[hash].[ext]';

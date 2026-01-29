@@ -91,7 +91,7 @@ function addNodeToFileTree(root: FileTreeNode, node: FileTreeNode): void {
 
 // ==================== 状态接口 ====================
 
-interface FileSystemState {
+export interface FileSystemState {
   /** 当前工作目录 */
   currentDirectory: string;
 
