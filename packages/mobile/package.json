@@ -1,10 +1,34 @@
 {
   "name": "@mindflow/mobile",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "MindFlow Mobile App (Flutter)",
+  "description": "MindFlow Mobile App - A modern Markdown editor for iOS and Android (Flutter)",
   "scripts": {
+    "dev": "flutter run",
+    "dev:ios": "flutter run -d ios",
+    "dev:android": "flutter run -d android",
+    "build:apk": "flutter build apk --release",
+    "build:appbundle": "flutter build appbundle --release",
+    "build:ios": "flutter build ios --release",
+    "build:ipa": "flutter build ipa --release",
+    "test": "flutter test",
     "lint": "flutter analyze",
-    "format": "dart format ."
-  }
+    "format": "dart format .",
+    "clean": "flutter clean",
+    "pub:get": "flutter pub get",
+    "pub:upgrade": "flutter pub upgrade",
+    "generate": "flutter pub run build_runner build",
+    "icons:generate": "flutter pub run flutter_launcher_icons:main",
+    "splash:generate": "flutter pub run flutter_native_splash:create"
+  },
+  "keywords": [
+    "flutter",
+    "markdown",
+    "editor",
+    "mobile",
+    "ios",
+    "android"
+  ],
+  "author": "MindFlow Team",
+  "license": "MIT"
 }

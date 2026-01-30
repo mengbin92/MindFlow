@@ -1,0 +1,98 @@
+name: mindflow
+description: MindFlow - A modern Markdown editor for mobile
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_bloc: ^8.1.3
+  bloc: ^8.1.2
+  equatable: ^2.0.5
+
+  # Storage
+  path_provider: ^2.1.1
+  shared_preferences: ^2.2.2
+  sqflite: ^2.3.0
+  path: ^1.8.3
+
+  # Markdown
+  flutter_markdown: ^0.6.18
+  markdown: ^7.1.1
+
+  # UI Components
+  flutter_slidable: ^3.0.1
+  flutter_staggered_grid_view: ^0.7.0
+  shimmer: ^3.0.0
+  flutter_svg: ^2.0.9
+  cached_network_image: ^3.3.0
+
+  # Editor
+  # flutter_quill: ^8.6.0  # 暂时禁用，使用原生 TextField
+  # quill_markdown: ^0.1.0
+
+  # Utils
+  intl: ^0.20.2
+  uuid: ^4.2.1
+  file_picker: ^6.1.1
+  share_plus: ^7.2.1
+  url_launcher: ^6.2.1
+
+  # Theme
+  dynamic_color: ^1.6.8
+  flex_color_scheme: ^7.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  bloc_test: ^9.1.5
+  mocktail: ^1.0.1
+  build_runner: ^2.4.7
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
+
+  # fonts:
+  #   - family: FiraCode
+  #     fonts:
+  #       - asset: assets/fonts/FiraCode-Light.ttf
+  #         weight: 300
+  #       - asset: assets/fonts/FiraCode-Regular.ttf
+  #         weight: 400
+  #       - asset: assets/fonts/FiraCode-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/FiraCode-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/FiraCode-Bold.ttf
+  #         weight: 700
+  #   - family: NotoSansSC
+  #     fonts:
+  #       - asset: assets/fonts/NotoSansSC-Regular.otf
+  #         weight: 400
+  #       - asset: assets/fonts/NotoSansSC-Bold.otf
+  #         weight: 700
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/icon-app.svg"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/icon-app.svg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
