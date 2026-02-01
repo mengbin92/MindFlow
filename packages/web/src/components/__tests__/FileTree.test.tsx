@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { FileTree } from '../FileTree';
@@ -105,7 +105,7 @@ describe('FileTree Component', () => {
     expect(screen.getByText('🔄 刷新')).toBeInTheDocument();
   });
 
-  it('should show loading state when file tree is null', () => {
+  it('should show loading state when file tree is null', async () => {
     const store = createStore({ fileTree: null });
     render(
       <Provider store={store}>
@@ -113,7 +113,9 @@ describe('FileTree Component', () => {
       </Provider>
     );
 
-    expect(screen.getByText('加载中...')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('加载中...')).toBeInTheDocument();
+    });
   });
 
   it('should open new file dialog when clicking 新建文件', () => {

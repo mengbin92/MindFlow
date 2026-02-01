@@ -3,7 +3,7 @@
  * @description 显示文件和文件夹的层次结构
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { FileTreeNode } from '@mindflow/types';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
@@ -247,10 +247,14 @@ export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
   };
 
   // 空状态 - 自动加载或显示刷新按钮
-  if (!fileTree) {
-    // 自动加载localStorage中的文件树
-    dispatch(getFileTree(''));
+  useEffect(() => {
+    if (!fileTree) {
+      // 自动加载localStorage中的文件树
+      dispatch(getFileTree(''));
+    }
+  }, [fileTree, dispatch]);
 
+  if (!fileTree) {
     return (
       <div className={`file-tree file-tree-empty ${className}`}>
         <div className="file-tree-empty-message">
