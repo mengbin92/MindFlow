@@ -71,17 +71,12 @@ export const Toolbar: React.FC<ToolbarProps> = ({ className = '' }) => {
     const filePath = `${currentDirectory}/${fileName}`;
     console.log('Creating file:', filePath);
     try {
-      // 创建文件
+      // 创建文件 - 文件树会在 createFile.fulfilled 中自动更新
       await dispatch(createFile(filePath) as any);
       console.log('File created successfully');
 
       // 关闭对话框
       setShowFileDialog(false);
-
-      // 刷新文件树
-      console.log('Refreshing file tree for:', currentDirectory);
-      await dispatch(getFileTree(currentDirectory) as any);
-      console.log('File tree refreshed');
     } catch (error: any) {
       console.error('Create file error:', error);
       alert(`创建文件失败: ${error?.message || error}`);
@@ -106,17 +101,12 @@ export const Toolbar: React.FC<ToolbarProps> = ({ className = '' }) => {
     const folderPath = `${currentDirectory}/${folderName}`;
     console.log('Creating folder:', folderPath);
     try {
-      // 创建文件夹
+      // 创建文件夹 - 文件树会在 createDir.fulfilled 中自动更新
       await dispatch(createDir(folderPath) as any);
       console.log('Folder created successfully');
 
       // 关闭对话框
       setShowFolderDialog(false);
-
-      // 刷新文件树
-      console.log('Refreshing file tree for:', currentDirectory);
-      await dispatch(getFileTree(currentDirectory) as any);
-      console.log('File tree refreshed');
     } catch (error: any) {
       console.error('Create folder error:', error);
       alert(`创建文件夹失败: ${error?.message || error}`);

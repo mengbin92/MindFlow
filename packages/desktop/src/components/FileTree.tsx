@@ -3,14 +3,13 @@
  * @description 显示文件和文件夹的层次结构
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { FileTreeNode } from '@mindflow/types';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   toggleFolder,
   setSelectedFile,
   openFile,
-  getFileTree,
 } from '../store/fileSystemSlice';
 import './FileTree.css';
 
@@ -28,7 +27,7 @@ const FileTreeNodeComponent: React.FC<FileTreeNodeProps> = ({ node, level, path 
   const selectedFile = useAppSelector(state => state.fileSystem.selectedFile);
   const nodePath = path ? `${path}/${node.name}` : node.name;
 
-  const isExpanded = expandedFolders.has(nodePath);
+  const isExpanded = expandedFolders.includes(nodePath);
   const isSelected = selectedFile === nodePath;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -121,16 +120,10 @@ interface FileTreeProps {
 }
 
 export const FileTree: React.FC<FileTreeProps> = ({ className = '' }) => {
-  const dispatch = useAppDispatch();
   const fileTree = useAppSelector(state => state.fileSystem.fileTree);
   const isLoading = useAppSelector(state => state.fileSystem.operationState.isLoading);
 
-  // 组件加载时获取文件树
-  useEffect(() => {
-    if (!fileTree) {
-      dispatch(getFileTree(''));
-    }
-  }, [dispatch, fileTree]);
+  // 注意：文件树的初始化由 App.tsx 负责，这里只负责渲染
 
   // 加载状态
   if (isLoading && !fileTree) {

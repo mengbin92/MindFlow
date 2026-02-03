@@ -17,7 +17,7 @@ interface FileSystemState {
   fileTree: FileTreeNode | null;
 
   /** 展开的文件夹路径列表 */
-  expandedFolders: Set<string>;
+  expandedFolders: string[];
 
   /** 选中的文件路径 */
   selectedFile: string | null;
@@ -46,7 +46,7 @@ interface FileSystemState {
 const initialState: FileSystemState = {
   currentDirectory: '',
   fileTree: null,
-  expandedFolders: new Set(),
+  expandedFolders: [],
   selectedFile: null,
   openFiles: [],
   currentFile: null,
@@ -200,10 +200,11 @@ const fileSystemSlice = createSlice({
     /** 切换文件夹展开状态 */
     toggleFolder: (state, action: PayloadAction<string>) => {
       const path = action.payload;
-      if (state.expandedFolders.has(path)) {
-        state.expandedFolders.delete(path);
+      const index = state.expandedFolders.indexOf(path);
+      if (index >= 0) {
+        state.expandedFolders.splice(index, 1);
       } else {
-        state.expandedFolders.add(path);
+        state.expandedFolders.push(path);
       }
     },
 
@@ -301,8 +302,11 @@ const fileSystemSlice = createSlice({
       .addCase(getFileTree.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
         state.operationState.lastOperation = Date.now();
-        state.currentDirectory = action.payload.path;
+        // 使用后端返回的文件树根节点路径（绝对路径）
+        state.currentDirectory = action.payload.fileTree.path || action.payload.path;
         state.fileTree = action.payload.fileTree;
+        console.log('File tree loaded:', action.payload.fileTree);
+        console.log('Current directory:', state.currentDirectory);
       })
       .addCase(getFileTree.rejected, (state, action) => {
         state.operationState.isLoading = false;
@@ -315,9 +319,54 @@ const fileSystemSlice = createSlice({
         state.operationState.isLoading = true;
         state.operationState.error = null;
       })
-      .addCase(createFile.fulfilled, (state) => {
+      .addCase(createFile.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
         state.operationState.lastOperation = Date.now();
+
+        // 将新创建的文件添加到文件树中
+        const newFile = action.payload;
+        if (state.fileTree && newFile) {
+          const parentPath = newFile.path.substring(0, newFile.path.lastIndexOf('/'));
+
+          // 如果在根目录创建
+          if (parentPath === state.currentDirectory) {
+            if (!state.fileTree.children) {
+              state.fileTree.children = [];
+            }
+            state.fileTree.children.push(newFile);
+            // 按名称排序
+            state.fileTree.children.sort((a, b) => {
+              if (a.isDir !== b.isDir) {
+                return a.isDir ? -1 : 1;
+              }
+              return a.name.localeCompare(b.name);
+            });
+          } else if (state.fileTree.children) {
+            // 递归查找父文件夹并添加文件
+            const findAndAddToFolder = (nodes: FileTreeNode[]): boolean => {
+              for (const node of nodes) {
+                if (node.isDir && node.children) {
+                  const nodePath = node.path || '';
+                  if (parentPath === nodePath) {
+                    node.children.push(newFile);
+                    node.children.sort((a, b) => {
+                      if (a.isDir !== b.isDir) {
+                        return a.isDir ? -1 : 1;
+                      }
+                      return a.name.localeCompare(b.name);
+                    });
+                    return true;
+                  }
+                  if (findAndAddToFolder(node.children)) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            };
+            findAndAddToFolder(state.fileTree.children);
+          }
+        }
       })
       .addCase(createFile.rejected, (state, action) => {
         state.operationState.isLoading = false;
@@ -330,9 +379,54 @@ const fileSystemSlice = createSlice({
         state.operationState.isLoading = true;
         state.operationState.error = null;
       })
-      .addCase(createDir.fulfilled, (state) => {
+      .addCase(createDir.fulfilled, (state, action) => {
         state.operationState.isLoading = false;
         state.operationState.lastOperation = Date.now();
+
+        // 将新创建的文件夹添加到文件树中
+        const newDir = action.payload;
+        if (state.fileTree && newDir) {
+          const parentPath = newDir.path.substring(0, newDir.path.lastIndexOf('/'));
+
+          // 如果在根目录创建
+          if (parentPath === state.currentDirectory) {
+            if (!state.fileTree.children) {
+              state.fileTree.children = [];
+            }
+            state.fileTree.children.push(newDir);
+            // 按名称排序，文件夹排在前面
+            state.fileTree.children.sort((a, b) => {
+              if (a.isDir !== b.isDir) {
+                return a.isDir ? -1 : 1;
+              }
+              return a.name.localeCompare(b.name);
+            });
+          } else if (state.fileTree.children) {
+            // 递归查找父文件夹并添加文件夹
+            const findAndAddToFolder = (nodes: FileTreeNode[]): boolean => {
+              for (const node of nodes) {
+                if (node.isDir && node.children) {
+                  const nodePath = node.path || '';
+                  if (parentPath === nodePath) {
+                    node.children.push(newDir);
+                    node.children.sort((a, b) => {
+                      if (a.isDir !== b.isDir) {
+                        return a.isDir ? -1 : 1;
+                      }
+                      return a.name.localeCompare(b.name);
+                    });
+                    return true;
+                  }
+                  if (findAndAddToFolder(node.children)) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            };
+            findAndAddToFolder(state.fileTree.children);
+          }
+        }
       })
       .addCase(createDir.rejected, (state, action) => {
         state.operationState.isLoading = false;

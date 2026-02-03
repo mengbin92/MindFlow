@@ -16,6 +16,8 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "desktop:dev": "cd packages/desktop && npm run dev",
     "desktop:build": "cd packages/desktop && npm run build",
+    "desktop:tauri:build": "cd packages/desktop && npm run tauri:build",
+    "desktop:tauri:build:debug": "cd packages/desktop && npm run tauri:build:debug",
     "web:dev": "cd packages/web && npm run dev",
     "web:build": "cd packages/web && npm run build",
     "install:all": "npm install"

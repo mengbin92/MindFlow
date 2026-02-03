@@ -52,10 +52,10 @@
       "category": "Developer Tool",
       "shortDescription": "A minimalist Markdown editor",
       "longDescription": "MindFlow is a minimalist Markdown editor with multi-platform support. Features include file management, real-time preview, syntax highlighting, and export options.",
-      "icon": ["icons/icon.png"],
+      "icon": ["icons/icon.png", "icons/icon.icns"],
       "macOS": {
         "minimumSystemVersion": "10.13",
-        "entitlements": null,
+        "entitlements": "entitlements.plist",
         "exceptionDomain": "",
         "frameworks": [],
         "providerShortName": null,

@@ -56,7 +56,9 @@ function AppContent(): JSX.Element {
       try {
         // 默认使用用户主目录下的 MindFlow 文件夹
         // 路径将在 Rust 端解析，使用 ~ 作为主目录的快捷方式
-        dispatch(getFileTree('~/MindFlow') as any);
+        console.log('Initializing workspace: ~/MindFlow');
+        const result = await dispatch(getFileTree('~/MindFlow') as any);
+        console.log('Workspace initialized:', result);
       } catch (error) {
         console.error('Failed to initialize workspace:', error);
       }

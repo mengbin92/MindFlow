@@ -79,7 +79,7 @@ describe('Window Slice', () => {
 
     it('should handle toggleMaximizeWindow fulfilled', () => {
       const state = windowReducer(
-        createState({ isLoading: true }),
+        createState({}, true),
         toggleMaximizeWindow.fulfilled(true, '', undefined)
       );
       expect(state.isLoading).toBe(false);
@@ -88,7 +88,7 @@ describe('Window Slice', () => {
 
     it('should handle toggleMaximizeWindow rejected', () => {
       const state = windowReducer(
-        createState({ isLoading: true }),
+        createState({}, true),
         toggleMaximizeWindow.rejected(new Error('Failed'), '', undefined)
       );
       expect(state.isLoading).toBe(false);
@@ -123,7 +123,7 @@ describe('Window Slice', () => {
         title: 'Saved State',
       };
       const state = windowReducer(
-        createState({ isLoading: true }),
+        createState({}, true),
         saveCurrentWindowState.fulfilled(newState, '', undefined)
       );
       expect(state.isLoading).toBe(false);
@@ -142,7 +142,7 @@ describe('Window Slice', () => {
         title: 'Restored',
       };
       const state = windowReducer(
-        createState({ isLoading: true }),
+        createState({}, true),
         restoreWindowState.fulfilled(restoredState, '', undefined)
       );
       expect(state.isLoading).toBe(false);
