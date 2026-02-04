@@ -7,11 +7,23 @@ on:
 
 jobs:
   release-desktop:
-    name: Release Desktop
+    name: Release Desktop (${{ matrix.platform }})
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            arch: arm64
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+            arch: x64
+          - platform: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            arch: x64
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            arch: x64
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -25,18 +37,43 @@ jobs:
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ matrix.target }}
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build desktop app
-        run: cd packages/desktop && npm run tauri build
+        run: cd packages/desktop && npm run tauri build -- --target ${{ matrix.target }}
 
-      - name: Upload artifact
+      - name: Collect macOS artifacts
+        if: matrix.platform == 'macos-latest'
+        run: |
+          mkdir -p ./artifacts
+          cp packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg ./artifacts/ || true
+          cp packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz ./artifacts/ || true
+
+      - name: Collect Linux artifacts
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          mkdir -p ./artifacts
+          cp packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb ./artifacts/ || true
+          cp packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage ./artifacts/ || true
+          cp packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/rpm/*.rpm ./artifacts/ || true
+
+      - name: Collect Windows artifacts
+        if: matrix.platform == 'windows-latest'
+        run: |
+          mkdir -p ./artifacts
+          cp packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/msi/*.msi ./artifacts/ || true
+          cp packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe ./artifacts/ || true
+        shell: pwsh
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-${{ matrix.platform }}
-          path: packages/desktop/src-tauri/target/release/bundle/
+          name: desktop-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ./artifacts/*
 
   release-web:
     name: Release Web
@@ -56,8 +93,95 @@ jobs:
       - name: Build web app
         run: cd packages/web && npm run build
 
-      - name: Upload to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Package web app
+        run: |
+          cd packages/web/dist
+          zip -r ../../../web-dist.zip .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./packages/web/dist
+          name: web-dist
+          path: ./web-dist.zip
+
+  create-release:
+    name: Create GitHub Release
+    needs: [release-desktop, release-web]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+          merge-multiple: true
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "## MindFlow v$VERSION" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### 桌面端下载" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "| 平台 | 架构 | 格式 |" >> RELEASE_NOTES.md
+          echo "|------|------|------|" >> RELEASE_NOTES.md
+          echo "| macOS | Intel (x64) | .dmg |" >> RELEASE_NOTES.md
+          echo "| macOS | Apple Silicon (arm64) | .dmg |" >> RELEASE_NOTES.md
+          echo "| Linux | x64 | .deb, .AppImage, .rpm |" >> RELEASE_NOTES.md
+          echo "| Windows | x64 | .msi, .exe |" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### Web 版本" >> RELEASE_NOTES.md
+          echo "Web 版本已部署到 GitHub Pages" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### 更新内容" >> RELEASE_NOTES.md
+          echo "详见 [CHANGELOG](../../blob/main/CHANGELOG.md)" >> RELEASE_NOTES.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: MindFlow v${{ steps.release_notes.outputs.version }}
+          body_path: RELEASE_NOTES.md
+          files: ./artifacts/**
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-web:
+    name: Deploy to GitHub Pages
+    needs: release-web
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download web artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+
+      - name: Extract web dist
+        run: |
+          unzip web-dist.zip -d ./dist
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
