@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::env;
 use std::fs;
 use std::path::Path;
-use tauri::{Manager, State};
+use tauri::State;
 use walkdir::WalkDir;
 
 // ==================== 配置相关结构 ====================
@@ -614,7 +614,7 @@ async fn save_current_window_state(window: tauri::Window) -> Result<WindowState,
         .ok_or("No current monitor")?;
 
     let monitor_position = current_monitor.position();
-    let monitor_size = current_monitor.size();
+    let _monitor_size = current_monitor.size();
 
     // 获取窗口位置和大小
     let window_position = window.outer_position()
@@ -653,11 +653,11 @@ async fn restore_window_state(window: tauri::Window) -> Result<WindowState, Stri
         .ok_or("No current monitor")?;
 
     let monitor_position = current_monitor.position();
-    let monitor_size = current_monitor.size();
+    let _monitor_size = current_monitor.size();
 
     // 计算绝对位置
-    let x = monitor_position.x + state.x;
-    let y = monitor_position.y + state.y;
+    let _x = monitor_position.x + state.x;
+    let _y = monitor_position.y + state.y;
 
     // 设置窗口位置和大小
     window.set_position(tauri::Position::Logical(tauri::LogicalPosition::new(
