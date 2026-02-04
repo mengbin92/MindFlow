@@ -13,16 +13,13 @@ jobs:
       matrix:
         include:
           - platform: macos-latest
-            args: '--target aarch64-apple-darwin'
-            arch: arm64
-          - platform: macos-latest
-            args: '--target x86_64-apple-darwin'
-            arch: x64
+            target: universal-apple-darwin
+            arch: universal
           - platform: ubuntu-latest
-            args: ''
+            target: x86_64-unknown-linux-gnu
             arch: x64
           - platform: windows-latest
-            args: ''
+            target: x86_64-pc-windows-msvc
             arch: x64
 
     runs-on: ${{ matrix.platform }}
@@ -38,23 +35,29 @@ jobs:
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
 
+      - name: Add Rust target (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libjavascriptcoregtk-4.1-dev libsoup-3.0-dev
 
       - name: Install dependencies
         run: npm install
 
       - name: Build desktop app
-        run: cd packages/desktop && npm run tauri build ${{ matrix.args }}
+        run: cd packages/desktop && npm run tauri build
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: Collect macOS artifacts
         if: matrix.platform == 'macos-latest'
         run: |
           mkdir -p ./artifacts
-          cp packages/desktop/src-tauri/target/*/release/bundle/dmg/*.dmg ./artifacts/ 2>/dev/null || true
           cp packages/desktop/src-tauri/target/release/bundle/dmg/*.dmg ./artifacts/ 2>/dev/null || true
 
       - name: Collect Linux artifacts
@@ -63,6 +66,16 @@ jobs:
           mkdir -p ./artifacts
           cp packages/desktop/src-tauri/target/release/bundle/deb/*.deb ./artifacts/ 2>/dev/null || true
           cp packages/desktop/src-tauri/target/release/bundle/appimage/*.AppImage ./artifacts/ 2>/dev/null || true
+
+      - name: Generate Windows icon
+        if: matrix.platform == 'windows-latest'
+        run: |
+          cd packages/desktop/src-tauri/icons
+          # Install ImageMagick
+          choco install imagemagick -y
+          refreshenv
+          # Generate icon.ico from PNG
+          magick convert icon.png -resize 256x256 icon.ico
 
       - name: Collect Windows artifacts
         if: matrix.platform == 'windows-latest'
@@ -133,8 +146,7 @@ jobs:
           echo "" >> RELEASE_NOTES.md
           echo "| Platform | Arch | Format |" >> RELEASE_NOTES.md
           echo "|----------|------|--------|" >> RELEASE_NOTES.md
-          echo "| macOS | Intel (x64) | .dmg |" >> RELEASE_NOTES.md
-          echo "| macOS | Apple Silicon (arm64) | .dmg |" >> RELEASE_NOTES.md
+          echo "| macOS | Universal (x64 + arm64) | .dmg |" >> RELEASE_NOTES.md
           echo "| Linux | x64 | .deb, .AppImage |" >> RELEASE_NOTES.md
           echo "| Windows | x64 | .msi, .exe |" >> RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
