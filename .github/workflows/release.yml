@@ -43,7 +43,7 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libsoup2.4-dev libjavascriptcoregtk-4.0-dev
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libsoup-3.0-dev libjavascriptcoregtk-4.1-dev
 
       - name: Install dependencies
         run: npm install
@@ -52,16 +52,18 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: |
           cd packages/desktop/src-tauri/icons
-          # Download and use ImageMagick portable
-          Invoke-WebRequest -Uri "https://imagemagick.org/archive/binaries/ImageMagick-7.1.1-29-portable-Q16-x64.zip" -OutFile "im.zip"
-          Expand-Archive -Path "im.zip" -DestinationPath "./im"
-          ./im/magick.exe convert icon.png -resize 256x256 icon.ico
+          # Create icon.ico using PowerShell and System.Drawing
+          $png = [System.Drawing.Image]::FromFile("icon.png")
+          $bitmap = New-Object System.Drawing.Bitmap(256, 256)
+          $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+          $graphics.DrawImage($png, 0, 0, 256, 256)
+          $bitmap.Save("icon.ico", [System.Drawing.Imaging.ImageFormat]::Icon)
+          $graphics.Dispose()
+          $bitmap.Dispose()
+          $png.Dispose()
 
       - name: Build desktop app
         run: cd packages/desktop && npm run tauri build
-        env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: Collect macOS artifacts
         if: matrix.platform == 'macos-latest'
