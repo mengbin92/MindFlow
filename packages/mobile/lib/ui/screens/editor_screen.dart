@@ -52,6 +52,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
   late PreviewRenderResult _previewResult;
   bool _hasChanges = false;
   bool _syncingTitle = false;
+  int _previewRequestId = 0;
 
   @override
   void initState() {
@@ -62,7 +63,8 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
         EditorBridgeController(initialContent: _document.content);
     _tabController = TabController(length: 2, vsync: this);
     _previewRenderService = const PreviewRenderService();
-    _previewResult = _previewRenderService.render(_document.content);
+    _previewResult = const PreviewRenderResult(markdown: '', html: '');
+    _refreshPreview(_document.content);
 
     _editorController.textController.addListener(_onContentChanged);
     _titleController.addListener(_onTitleChanged);
@@ -80,7 +82,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       _titleController.value = TextEditingValue(text: _document.title);
       _syncingTitle = false;
       _editorController.setDocumentContent(_document.content);
-      _previewResult = _previewRenderService.render(_document.content);
+      _refreshPreview(_document.content);
       _hasChanges = false;
       context.read<FileBloc>().add(FileSelected(_document));
     }
@@ -108,12 +110,23 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       return;
     }
     context.read<FileBloc>().add(FileContentChanged(_editorController.text));
-    _previewResult = _previewRenderService.render(_editorController.text);
+    _refreshPreview(_editorController.text);
     if (!_hasChanges && mounted) {
       setState(() => _hasChanges = true);
     } else {
       setState(() {});
     }
+  }
+
+  Future<void> _refreshPreview(String markdown) async {
+    final requestId = ++_previewRequestId;
+    final result = await _previewRenderService.render(markdown);
+    if (!mounted || requestId != _previewRequestId) {
+      return;
+    }
+    setState(() {
+      _previewResult = result;
+    });
   }
 
   Future<void> _handleCloseRequest() async {

@@ -1,15 +1,53 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mindflow/render/preview_render_service.dart';
+import 'package:mindflow/render/syntax_bridge_result.dart';
+import 'package:mindflow/render/syntax_bridge_service.dart';
+
+class SuccessfulBridgeService implements SyntaxBridgeService {
+  @override
+  Future<SyntaxBridgeResult> render(String markdown) async {
+    return const SyntaxBridgeResult(
+      html: '<p>bridge html</p>',
+      usedBridge: true,
+      errors: [],
+    );
+  }
+}
+
+class FailingBridgeService implements SyntaxBridgeService {
+  @override
+  Future<SyntaxBridgeResult> render(String markdown) async {
+    throw Exception('bridge unavailable');
+  }
+}
 
 void main() {
   group('PreviewRenderService', () {
-    test('renders markdown into html', () {
-      const service = PreviewRenderService();
+    test('renders markdown into html through bridge when available', () async {
+      final service = PreviewRenderService(
+        syntaxBridgeService: SuccessfulBridgeService(),
+      );
 
-      final result = service.render('# Title');
+      final result = await service.render('# Title');
+
+      expect(result.markdown, '# Title');
+      expect(result.html, '<p>bridge html</p>');
+      expect(result.usedBridge, isTrue);
+      expect(result.fallbackUsed, isFalse);
+    });
+
+    test('falls back to markdown html when bridge fails', () async {
+      final service = PreviewRenderService(
+        syntaxBridgeService: FailingBridgeService(),
+      );
+
+      final result = await service.render('# Title');
 
       expect(result.markdown, '# Title');
       expect(result.html, contains('Title</h1>'));
+      expect(result.usedBridge, isFalse);
+      expect(result.fallbackUsed, isTrue);
+      expect(result.errors, isNotEmpty);
     });
 
     test('builds a complete html document for export', () {

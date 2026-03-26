@@ -20,7 +20,11 @@ class PreviewBridgeView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Text(
-            'Preview Bridge 已通过 HTML 编排层生成预览内容。',
+            result.usedBridge
+                ? 'Preview Bridge 已启用 LaTeX 渲染桥接。'
+                : (result.fallbackUsed
+                    ? 'Preview Bridge 当前已回退到本地 Markdown 渲染。'
+                    : 'Preview Bridge 已通过 HTML 编排层生成预览内容。'),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),

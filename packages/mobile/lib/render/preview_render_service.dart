@@ -1,18 +1,58 @@
 import 'package:markdown/markdown.dart' as md;
 
 import 'preview_render_result.dart';
+import 'syntax_bridge_result.dart';
+import 'syntax_bridge_service.dart';
 
 class PreviewRenderService {
-  const PreviewRenderService();
+  const PreviewRenderService({
+    SyntaxBridgeService? syntaxBridgeService,
+  }) : syntaxBridgeService = syntaxBridgeService ?? const _DefaultLatexBridge();
 
-  PreviewRenderResult render(String markdown) {
+  final SyntaxBridgeService? syntaxBridgeService;
+
+  Future<PreviewRenderResult> render(String markdown) async {
+    if (syntaxBridgeService != null) {
+      try {
+        final bridgeResult = await syntaxBridgeService!.render(markdown);
+        return PreviewRenderResult(
+          markdown: markdown,
+          html: bridgeResult.html,
+          usedBridge: bridgeResult.usedBridge,
+          fallbackUsed: false,
+          errors: bridgeResult.errors,
+        );
+      } catch (error) {
+        final fallbackResult = _buildFallback(markdown);
+        return PreviewRenderResult(
+          markdown: markdown,
+          html: fallbackResult.html,
+          usedBridge: false,
+          fallbackUsed: true,
+          errors: [error.toString()],
+        );
+      }
+    }
+
+    final fallbackResult = _buildFallback(markdown);
+    return PreviewRenderResult(
+      markdown: markdown,
+      html: fallbackResult.html,
+      usedBridge: false,
+      fallbackUsed: false,
+      errors: const [],
+    );
+  }
+
+  SyntaxBridgeResult _buildFallback(String markdown) {
     final html = md.markdownToHtml(
       markdown.isEmpty ? '无内容' : markdown,
       extensionSet: md.ExtensionSet.gitHubWeb,
     );
-    return PreviewRenderResult(
-      markdown: markdown,
+    return SyntaxBridgeResult(
       html: html,
+      usedBridge: false,
+      errors: const [],
     );
   }
 
@@ -142,4 +182,8 @@ class PreviewRenderService {
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#39;');
   }
+}
+
+class _DefaultLatexBridge extends LatexSyntaxBridgeService {
+  const _DefaultLatexBridge();
 }
