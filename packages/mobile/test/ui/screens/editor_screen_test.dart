@@ -170,7 +170,7 @@ void main() {
     final document = Document.create(
       id: 'article',
       title: 'Roadmap',
-      content: 'Energy: \$E=mc^2\$',
+      content: '```mermaid\ngraph TD;\nA-->B;\n```',
     );
     final documentRepository = RecordingDocumentRepository(document);
     final workspaceRepository = FakeWorkspaceRepository();
@@ -213,8 +213,9 @@ void main() {
     expect(documentRepository.lastExportedHtml, contains('<!DOCTYPE html>'));
     expect(documentRepository.lastExportedHtml, contains('<title>Roadmap</title>'));
     expect(documentRepository.lastExportedHtml, contains('<main class="mf-document">'));
-    expect(documentRepository.lastExportedHtml, contains('mf-latex-inline'));
-    expect(documentRepository.lastExportedHtml, isNot(contains('\$E=mc^2\$')));
+    expect(documentRepository.lastExportedHtml, contains('mf-mermaid'));
+    expect(documentRepository.lastExportedHtml, contains('mermaid.min.js'));
+    expect(documentRepository.lastExportedHtml, contains('data-mermaid-theme'));
     expect(find.textContaining('已导出到'), findsOneWidget);
   });
 
@@ -222,7 +223,7 @@ void main() {
     final document = Document.create(
       id: 'article',
       title: 'Roadmap',
-      content: 'Energy: \$E=mc^2\$',
+      content: '```mermaid\ngraph TD;\nA-->B;\n```',
     );
     final documentRepository = RecordingDocumentRepository(document);
     final workspaceRepository = FakeWorkspaceRepository();
@@ -263,8 +264,8 @@ void main() {
 
     expect(documentRepository.exportedPdfIds, [document.id]);
     expect(documentRepository.lastExportedHtml, contains('<!DOCTYPE html>'));
-    expect(documentRepository.lastExportedHtml, contains('mf-latex-inline'));
-    expect(documentRepository.lastExportedHtml, isNot(contains('\$E=mc^2\$')));
+    expect(documentRepository.lastExportedHtml, contains('mf-mermaid'));
+    expect(documentRepository.lastExportedHtml, contains('data-mermaid-theme'));
     expect(find.textContaining('已导出到'), findsOneWidget);
   });
 
@@ -272,7 +273,7 @@ void main() {
     final document = Document.create(
       id: 'article',
       title: 'Roadmap',
-      content: 'Energy: \$E=mc^2\$',
+      content: '```mermaid\ngraph TD;\nA-->B;\n```',
     );
     final documentRepository = RecordingDocumentRepository(document);
     final workspaceRepository = FakeWorkspaceRepository();
@@ -313,8 +314,8 @@ void main() {
 
     expect(documentRepository.exportedImageIds, [document.id]);
     expect(documentRepository.lastExportedHtml, contains('<!DOCTYPE html>'));
-    expect(documentRepository.lastExportedHtml, contains('mf-latex-inline'));
-    expect(documentRepository.lastExportedHtml, isNot(contains('\$E=mc^2\$')));
+    expect(documentRepository.lastExportedHtml, contains('mf-mermaid'));
+    expect(documentRepository.lastExportedHtml, contains('data-mermaid-theme'));
     expect(find.textContaining('已导出到'), findsOneWidget);
   });
 
@@ -323,7 +324,7 @@ void main() {
     final document = Document.create(
       id: 'article',
       title: 'Roadmap',
-      content: 'Energy: \$E=mc^2\$',
+      content: '```mermaid\ngraph TD;\nA-->B;\n```',
     );
     final documentRepository = RecordingDocumentRepository(document);
     final workspaceRepository = FakeWorkspaceRepository();
@@ -364,8 +365,8 @@ void main() {
 
     expect(documentRepository.exportedImageArchiveIds, [document.id]);
     expect(documentRepository.lastExportedHtml, contains('<!DOCTYPE html>'));
-    expect(documentRepository.lastExportedHtml, contains('mf-latex-inline'));
-    expect(documentRepository.lastExportedHtml, isNot(contains('\$E=mc^2\$')));
+    expect(documentRepository.lastExportedHtml, contains('mf-mermaid'));
+    expect(documentRepository.lastExportedHtml, contains('data-mermaid-theme'));
     expect(find.textContaining('已导出到'), findsOneWidget);
   });
 }

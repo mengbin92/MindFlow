@@ -28,5 +28,32 @@ $$
       expect(result.html, contains(r'\int_0^1 x^2 dx'));
       expect(result.html, isNot(contains(r'$$')));
     });
+
+    test('renders mermaid fenced block into bridge placeholder html', () async {
+      final service = LatexSyntaxBridgeService();
+
+      final result = await service.render(
+        '```mermaid\ngraph TD;\nA-->B;\n```',
+        isDarkMode: false,
+      );
+
+      expect(result.usedBridge, isTrue);
+      expect(result.html, contains('mf-mermaid'));
+      expect(result.html, contains('graph TD;'));
+      expect(result.html, contains('A--&gt;B;'));
+      expect(result.html, contains('data-mermaid-theme="default"'));
+      expect(result.html, isNot(contains('```mermaid')));
+    });
+
+    test('renders mermaid fenced block with dark theme metadata', () async {
+      final service = LatexSyntaxBridgeService();
+
+      final result = await service.render(
+        '```mermaid\ngraph TD;\nA-->B;\n```',
+        isDarkMode: true,
+      );
+
+      expect(result.html, contains('data-mermaid-theme="dark"'));
+    });
   });
 }

@@ -51,6 +51,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
   late PreviewRenderService _previewRenderService;
   late PreviewRenderResult _previewResult;
   bool _hasChanges = false;
+  bool _isDarkMode = false;
   bool _syncingTitle = false;
   int _previewRequestId = 0;
 
@@ -64,12 +65,22 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
     _tabController = TabController(length: 2, vsync: this);
     _previewRenderService = const PreviewRenderService();
     _previewResult = const PreviewRenderResult(markdown: '', html: '');
-    _refreshPreview(_document.content);
 
     _editorController.textController.addListener(_onContentChanged);
     _titleController.addListener(_onTitleChanged);
 
     context.read<FileBloc>().add(FileSelected(_document));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    if (_previewResult.markdown != _editorController.text ||
+        _isDarkMode != isDarkMode) {
+      _isDarkMode = isDarkMode;
+      _refreshPreview(_editorController.text, isDarkMode: isDarkMode);
+    }
   }
 
   @override
@@ -82,7 +93,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       _titleController.value = TextEditingValue(text: _document.title);
       _syncingTitle = false;
       _editorController.setDocumentContent(_document.content);
-      _refreshPreview(_document.content);
+      _refreshPreview(_document.content, isDarkMode: _isDarkMode);
       _hasChanges = false;
       context.read<FileBloc>().add(FileSelected(_document));
     }
@@ -110,7 +121,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       return;
     }
     context.read<FileBloc>().add(FileContentChanged(_editorController.text));
-    _refreshPreview(_editorController.text);
+    _refreshPreview(_editorController.text, isDarkMode: _isDarkMode);
     if (!_hasChanges && mounted) {
       setState(() => _hasChanges = true);
     } else {
@@ -118,15 +129,36 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
     }
   }
 
-  Future<void> _refreshPreview(String markdown) async {
+  Future<PreviewRenderResult> _refreshPreview(
+    String markdown, {
+    required bool isDarkMode,
+  }) async {
     final requestId = ++_previewRequestId;
-    final result = await _previewRenderService.render(markdown);
+    final result = await _previewRenderService.render(
+      markdown,
+      isDarkMode: isDarkMode,
+    );
     if (!mounted || requestId != _previewRequestId) {
-      return;
+      return result;
     }
     setState(() {
       _previewResult = result;
     });
+    return result;
+  }
+
+  Future<String> _buildCurrentHtmlDocument() async {
+    final previewResult = await _refreshPreview(
+      _editorController.text,
+      isDarkMode: _isDarkMode,
+    );
+    final title = _titleController.text.trim().isEmpty
+        ? _document.displayTitle
+        : _titleController.text.trim();
+    return _previewRenderService.buildHtmlDocument(
+      title: title,
+      bodyHtml: previewResult.html,
+    );
   }
 
   Future<void> _handleCloseRequest() async {
@@ -228,12 +260,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
         await _saveDocument(showMessage: false);
       }
 
-      final htmlDocument = _previewRenderService.buildHtmlDocument(
-        title: _titleController.text.trim().isEmpty
-            ? _document.displayTitle
-            : _titleController.text.trim(),
-        bodyHtml: _previewResult.html,
-      );
+      final htmlDocument = await _buildCurrentHtmlDocument();
 
       final exportPath = await context.read<DocumentRepository>().exportToHtml(
             _document.id,
@@ -269,12 +296,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
         await _saveDocument(showMessage: false);
       }
 
-      final htmlDocument = _previewRenderService.buildHtmlDocument(
-        title: _titleController.text.trim().isEmpty
-            ? _document.displayTitle
-            : _titleController.text.trim(),
-        bodyHtml: _previewResult.html,
-      );
+      final htmlDocument = await _buildCurrentHtmlDocument();
 
       final exportPath = await context.read<DocumentRepository>().exportToPdf(
             _document.id,
@@ -310,12 +332,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
         await _saveDocument(showMessage: false);
       }
 
-      final htmlDocument = _previewRenderService.buildHtmlDocument(
-        title: _titleController.text.trim().isEmpty
-            ? _document.displayTitle
-            : _titleController.text.trim(),
-        bodyHtml: _previewResult.html,
-      );
+      final htmlDocument = await _buildCurrentHtmlDocument();
 
       final exportPath = await context.read<DocumentRepository>().exportToImage(
             _document.id,
@@ -351,12 +368,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
         await _saveDocument(showMessage: false);
       }
 
-      final htmlDocument = _previewRenderService.buildHtmlDocument(
-        title: _titleController.text.trim().isEmpty
-            ? _document.displayTitle
-            : _titleController.text.trim(),
-        bodyHtml: _previewResult.html,
-      );
+      final htmlDocument = await _buildCurrentHtmlDocument();
 
       final exportPath =
           await context.read<DocumentRepository>().exportToImagesZip(

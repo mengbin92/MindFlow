@@ -1,15 +1,25 @@
 import 'syntax_bridge_result.dart';
 
 abstract class SyntaxBridgeService {
-  Future<SyntaxBridgeResult> render(String markdown);
+  Future<SyntaxBridgeResult> render(String markdown, {bool isDarkMode = false});
 }
 
 class LatexSyntaxBridgeService implements SyntaxBridgeService {
   const LatexSyntaxBridgeService();
 
   @override
-  Future<SyntaxBridgeResult> render(String markdown) async {
+  Future<SyntaxBridgeResult> render(String markdown,
+      {bool isDarkMode = false}) async {
     var html = markdown;
+
+    html = html.replaceAllMapped(
+      RegExp(r'```mermaid\s*\n([\s\S]+?)```'),
+      (match) {
+        final code = _escapeHtml(match.group(1)?.trim() ?? '');
+        final theme = isDarkMode ? 'dark' : 'default';
+        return '<pre class="mf-mermaid" data-mermaid-theme="$theme">$code</pre>';
+      },
+    );
 
     html = html.replaceAllMapped(RegExp(r'\$\$([\s\S]+?)\$\$'), (match) {
       final expression = _escapeHtml(match.group(1)?.trim() ?? '');

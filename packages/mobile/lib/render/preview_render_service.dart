@@ -11,10 +11,14 @@ class PreviewRenderService {
 
   final SyntaxBridgeService? syntaxBridgeService;
 
-  Future<PreviewRenderResult> render(String markdown) async {
+  Future<PreviewRenderResult> render(String markdown,
+      {bool isDarkMode = false}) async {
     if (syntaxBridgeService != null) {
       try {
-        final bridgeResult = await syntaxBridgeService!.render(markdown);
+        final bridgeResult = await syntaxBridgeService!.render(
+          markdown,
+          isDarkMode: isDarkMode,
+        );
         return PreviewRenderResult(
           markdown: markdown,
           html: bridgeResult.html,
@@ -61,6 +65,29 @@ class PreviewRenderService {
     required String bodyHtml,
   }) {
     final safeTitle = _escapeHtml(title.isEmpty ? 'Untitled' : title);
+    final hasMermaid = bodyHtml.contains('mf-mermaid');
+    final mermaidBootstrap = hasMermaid
+        ? '''
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.mf-mermaid').forEach((element, index) => {
+        const source = element.textContent ?? '';
+        const theme = element.getAttribute('data-mermaid-theme') ?? 'default';
+        const id = `mf-mermaid-\${index}`;
+        try {
+          mermaid.initialize({ startOnLoad: false, theme });
+          mermaid.render(id, source).then(({ svg }) => {
+            element.outerHTML = `<div class="mf-mermaid-rendered" data-mermaid-theme="\${theme}">\${svg}</div>`;
+          });
+        } catch (error) {
+          element.outerHTML = `<div class="mf-mermaid-error">\${String(error)}</div>`;
+        }
+      });
+    });
+  </script>
+'''
+        : '';
 
     return '''
 <!DOCTYPE html>
@@ -164,6 +191,7 @@ class PreviewRenderService {
       background: #f7f2e7;
     }
   </style>
+$mermaidBootstrap
 </head>
 <body>
   <main class="mf-document">
