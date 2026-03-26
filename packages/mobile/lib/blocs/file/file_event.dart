@@ -55,6 +55,15 @@ class FileSelected extends FileEvent {
   List<Object?> get props => [document];
 }
 
+class FileOpened extends FileEvent {
+  final String id;
+
+  const FileOpened(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
 class FileContentChanged extends FileEvent {
   final String content;
 
@@ -103,11 +112,16 @@ class FileMoved extends FileEvent {
   final String id;
   final String? newParentId;
 
-  const FileMoved({
-    required this.id,
-    this.newParentId,
-  });
+  const FileMoved({required this.id, this.newParentId});
 
   @override
   List<Object?> get props => [id, newParentId];
+}
+
+class WorkspacePicked extends FileEvent {
+  const WorkspacePicked();
+}
+
+class LocalLibrarySelected extends FileEvent {
+  const LocalLibrarySelected();
 }

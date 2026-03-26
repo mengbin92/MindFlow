@@ -3,16 +3,10 @@ part of 'settings_bloc.dart';
 class SettingsState extends Equatable {
   final AppSettings settings;
 
-  const SettingsState({
-    this.settings = const AppSettings(),
-  });
+  const SettingsState({this.settings = const AppSettings()});
 
-  SettingsState copyWith({
-    AppSettings? settings,
-  }) {
-    return SettingsState(
-      settings: settings ?? this.settings,
-    );
+  SettingsState copyWith({AppSettings? settings}) {
+    return SettingsState(settings: settings ?? this.settings);
   }
 
   ThemeMode get themeMode => settings.themeMode;

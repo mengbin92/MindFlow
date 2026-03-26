@@ -51,19 +51,13 @@ class FileListItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
-            document.isFolder
-                ? Icons.folder
-                : Icons.description,
-            color: document.isFolder
-                ? Colors.blue
-                : Colors.green,
+            document.isFolder ? Icons.folder : Icons.description,
+            color: document.isFolder ? Colors.blue : Colors.green,
           ),
         ),
         title: Text(
           document.displayTitle,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w500),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -92,16 +86,9 @@ class FileListItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (document.isFavorite)
-              const Icon(
-                Icons.favorite,
-                color: Colors.orange,
-                size: 16,
-              ),
+              const Icon(Icons.favorite, color: Colors.orange, size: 16),
             if (document.isFolder)
-              const Icon(
-                Icons.chevron_right,
-                color: Colors.grey,
-              ),
+              const Icon(Icons.chevron_right, color: Colors.grey),
           ],
         ),
       ),

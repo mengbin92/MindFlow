@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-
+import 'application/workspace/workspace_service.dart';
+import 'app/app.dart';
+import 'app/app_bloc_observer.dart';
 import 'blocs/file/file_bloc.dart';
 import 'blocs/settings/settings_bloc.dart';
+import 'domain/repositories/document_repository.dart';
+import 'domain/repositories/workspace_repository.dart';
 import 'repositories/file_repository.dart';
 import 'services/storage_service.dart';
-import 'ui/themes/app_theme.dart';
-import 'ui/screens/home_screen.dart';
-import 'utils/app_localizations.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = const AppBlocObserver();
+
+  final storageService = StorageService();
+  await storageService.initialize();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -28,60 +32,52 @@ void main() {
     ),
   );
 
-  runApp(const MindFlowApp());
+  runApp(MindFlowApp(storageService: storageService));
 }
 
 class MindFlowApp extends StatelessWidget {
-  const MindFlowApp({super.key});
+  final StorageService storageService;
+
+  const MindFlowApp({super.key, required this.storageService});
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider(create: (context) => storageService),
         RepositoryProvider(
-          create: (context) => StorageService(),
+          create: (context) =>
+              FileRepository(storageService: context.read<StorageService>()),
+        ),
+        RepositoryProvider<DocumentRepository>(
+          create: (context) => context.read<FileRepository>(),
+        ),
+        RepositoryProvider<WorkspaceRepository>(
+          create: (context) => context.read<FileRepository>(),
         ),
         RepositoryProvider(
-          create: (context) => FileRepository(
-            storageService: context.read<StorageService>(),
+          create: (context) => WorkspaceService(
+            documentRepository: context.read<DocumentRepository>(),
           ),
         ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => SettingsBloc(
-              storageService: context.read<StorageService>(),
-            )..add(const SettingsLoaded()),
+            create: (context) =>
+                SettingsBloc(storageService: context.read<StorageService>())
+                  ..add(const SettingsLoaded()),
           ),
           BlocProvider(
             create: (context) => FileBloc(
-              fileRepository: context.read<FileRepository>(),
+              documentRepository: context.read<DocumentRepository>(),
+              workspaceRepository: context.read<WorkspaceRepository>(),
+              workspaceService: context.read<WorkspaceService>(),
+              storageService: context.read<StorageService>(),
             )..add(const FilesLoaded()),
           ),
         ],
-        child: BlocBuilder<SettingsBloc, SettingsState>(
-          builder: (context, settingsState) {
-            return MaterialApp(
-              title: 'MindFlow',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: settingsState.themeMode,
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: const [
-                Locale('en', 'US'),
-                Locale('zh', 'CN'),
-              ],
-              home: const HomeScreen(),
-            );
-          },
-        ),
+        child: const MindFlowAppView(),
       ),
     );
   }

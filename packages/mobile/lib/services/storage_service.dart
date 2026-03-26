@@ -6,6 +6,8 @@ class StorageService {
   static const String _settingsKey = 'app_settings';
   static const String _recentFilesKey = 'recent_files';
   static const String _lastOpenedFileKey = 'last_opened_file';
+  static const String _workspaceRootPathKey = 'workspace_root_path';
+  static const String _favoritePathsKey = 'favorite_paths';
 
   late SharedPreferences _prefs;
 
@@ -61,6 +63,36 @@ class StorageService {
 
   String? getLastOpenedFile() {
     return _prefs.getString(_lastOpenedFileKey);
+  }
+
+  Future<void> saveWorkspaceRootPath(String? path) async {
+    if (path == null || path.isEmpty) {
+      await _prefs.remove(_workspaceRootPathKey);
+      return;
+    }
+    await _prefs.setString(_workspaceRootPathKey, path);
+  }
+
+  String? getWorkspaceRootPath() {
+    return _prefs.getString(_workspaceRootPathKey);
+  }
+
+  Future<void> saveFavoritePaths(List<String> paths) async {
+    await _prefs.setStringList(_favoritePathsKey, paths);
+  }
+
+  List<String> getFavoritePaths() {
+    return _prefs.getStringList(_favoritePathsKey) ?? [];
+  }
+
+  Future<void> toggleFavoritePath(String path) async {
+    final items = getFavoritePaths();
+    if (items.contains(path)) {
+      items.remove(path);
+    } else {
+      items.insert(0, path);
+    }
+    await saveFavoritePaths(items);
   }
 
   // 通用存储

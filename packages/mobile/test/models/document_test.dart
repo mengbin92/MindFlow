@@ -14,10 +14,7 @@ void main() {
     });
 
     test('should create a folder', () {
-      final folder = Document.create(
-        title: 'Test Folder',
-        isFolder: true,
-      );
+      final folder = Document.create(title: 'Test Folder', isFolder: true);
 
       expect(folder.isFolder, true);
       expect(folder.title, 'Test Folder');
@@ -32,10 +29,7 @@ void main() {
     });
 
     test('should convert to and from JSON', () {
-      final doc = Document.create(
-        title: 'JSON Test',
-        content: 'Test content',
-      );
+      final doc = Document.create(title: 'JSON Test', content: 'Test content');
 
       final json = doc.toJson();
       final restored = Document.fromJson(json);

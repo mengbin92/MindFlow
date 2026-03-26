@@ -10,7 +10,7 @@ part 'settings_state.dart';
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final StorageService storageService;
 
-  SettingsBloc({required this.storageService}) : super(SettingsState()) {
+  SettingsBloc({required this.storageService}) : super(const SettingsState()) {
     on<SettingsLoaded>(_onSettingsLoaded);
     on<ThemeModeChanged>(_onThemeModeChanged);
     on<FontSizeChanged>(_onFontSizeChanged);

@@ -73,13 +73,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _createNewDocument(BuildContext context) {
-    context.read<FileBloc>().add(const FileCreated(
-          title: '未命名文档',
-          content: '',
-        ));
+    context.read<FileBloc>().add(
+          const FileCreated(title: '未命名文档', content: ''),
+        );
 
     // 等待文档创建后打开编辑器
     Future.delayed(const Duration(milliseconds: 100), () {
+      if (!context.mounted) {
+        return;
+      }
       final state = context.read<FileBloc>().state;
       if (state.documents.isNotEmpty) {
         final newDoc = state.documents.first;
@@ -89,18 +91,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _createNewFolder(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => _CreateFolderDialog(),
-    );
+    showDialog(context: context, builder: (context) => _CreateFolderDialog());
   }
 
   void _openEditor(BuildContext context, Document document) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => EditorScreen(document: document),
-      ),
+      MaterialPageRoute(builder: (context) => EditorScreen(document: document)),
     );
   }
 }
@@ -177,26 +174,16 @@ class _FileListView extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.folder_open,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
+                      Icon(Icons.folder_open, size: 64, color: Colors.grey),
                       SizedBox(height: 16),
                       Text(
                         '暂无文档',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                       SizedBox(height: 8),
                       Text(
                         '点击右下角按钮创建新文档',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -205,38 +192,35 @@ class _FileListView extends StatelessWidget {
             }
 
             return SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final document = documents[index];
-                  return FileListItem(
-                    document: document,
-                    onTap: () {
-                      if (document.isFolder) {
-                        context.read<FileBloc>().add(
-                              FolderNavigated(document.id),
-                            );
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EditorScreen(document: document),
-                          ),
-                        );
-                      }
-                    },
-                    onFavoriteToggle: () {
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final document = documents[index];
+                return FileListItem(
+                  document: document,
+                  onTap: () {
+                    if (document.isFolder) {
                       context.read<FileBloc>().add(
-                            FileToggledFavorite(document.id),
+                            FolderNavigated(document.id),
                           );
-                    },
-                    onDelete: () {
-                      _showDeleteConfirm(context, document);
-                    },
-                  );
-                },
-                childCount: documents.length,
-              ),
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditorScreen(document: document),
+                        ),
+                      );
+                    }
+                  },
+                  onFavoriteToggle: () {
+                    context.read<FileBloc>().add(
+                          FileToggledFavorite(document.id),
+                        );
+                  },
+                  onDelete: () {
+                    _showDeleteConfirm(context, document);
+                  },
+                );
+              }, childCount: documents.length),
             );
           },
         ),
@@ -260,9 +244,7 @@ class _FileListView extends StatelessWidget {
               context.read<FileBloc>().add(FileDeleted(document.id));
               Navigator.pop(context);
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('删除'),
           ),
         ],
@@ -303,10 +285,7 @@ class _CreateFolderDialogState extends State<_CreateFolderDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('取消'),
         ),
-        FilledButton(
-          onPressed: _createFolder,
-          child: const Text('创建'),
-        ),
+        FilledButton(onPressed: _createFolder, child: const Text('创建')),
       ],
     );
   }
@@ -314,10 +293,7 @@ class _CreateFolderDialogState extends State<_CreateFolderDialog> {
   void _createFolder() {
     final name = _controller.text.trim();
     if (name.isNotEmpty) {
-      context.read<FileBloc>().add(FileCreated(
-            title: name,
-            isFolder: true,
-          ));
+      context.read<FileBloc>().add(FileCreated(title: name, isFolder: true));
       Navigator.pop(context);
     }
   }

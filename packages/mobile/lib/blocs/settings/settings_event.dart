@@ -33,10 +33,7 @@ class AutoSaveChanged extends SettingsEvent {
   final bool enabled;
   final int interval;
 
-  const AutoSaveChanged({
-    required this.enabled,
-    this.interval = 30,
-  });
+  const AutoSaveChanged({required this.enabled, this.interval = 30});
 
   @override
   List<Object?> get props => [enabled, interval];

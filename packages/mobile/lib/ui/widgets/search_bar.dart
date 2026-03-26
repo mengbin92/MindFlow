@@ -69,9 +69,7 @@ class DocumentSearchDelegate extends SearchDelegate<String?> {
   @override
   Widget buildSuggestions(BuildContext context) {
     if (query.isEmpty) {
-      return const Center(
-        child: Text('输入关键词搜索文档'),
-      );
+      return const Center(child: Text('输入关键词搜索文档'));
     }
     return _buildSearchResults(context);
   }
@@ -92,9 +90,7 @@ class DocumentSearchDelegate extends SearchDelegate<String?> {
         }).toList();
 
         if (results.isEmpty) {
-          return const Center(
-            child: Text('未找到相关文档'),
-          );
+          return const Center(child: Text('未找到相关文档'));
         }
 
         return ListView.builder(
