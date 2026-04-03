@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 
 import '../ui/screens/app_shell_screen.dart';
+import '../ui/screens/presentation_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -38,6 +39,17 @@ class AppRouter {
         path: AppShellSection.settings.path,
         builder: (context, state) =>
             const AppShellScreen(section: AppShellSection.settings),
+      ),
+      GoRoute(
+        path: '/presentation',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return PresentationScreen(
+            markdown: extra['markdown'] as String? ?? '',
+            title: extra['title'] as String? ?? '',
+            theme: extra['theme'] as String? ?? 'black',
+          );
+        },
       ),
     ],
   );

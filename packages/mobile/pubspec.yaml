@@ -49,6 +49,7 @@ dependencies:
   printing: ^5.13.4
   share_plus: ^7.2.1
   url_launcher: ^6.2.1
+  webview_flutter: ^4.10.0
 
   # Theme
   dynamic_color: ^1.6.8
