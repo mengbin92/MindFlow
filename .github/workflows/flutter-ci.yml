@@ -160,7 +160,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Debug: show Generated.xcconfig
+      - name: "Debug: show Generated.xcconfig"
         run: |
           echo "=== Generated.xcconfig ==="
           cat ios/Flutter/Generated.xcconfig
