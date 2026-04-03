@@ -127,17 +127,12 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Install NDK 27
-        run: |
-          mkdir -p $ANDROID_HOME/ndk
-          curl -sL https://dl.google.com/android/repository/android-ndk-r27b-linux.zip -o /tmp/ndk.zip
-          unzip -q /tmp/ndk.zip -d $ANDROID_HOME/ndk
-          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/android-ndk-r27b" >> $GITHUB_ENV
-
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Android APK
+        env:
+          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/android-ndk-r27b
         run: flutter build apk --debug
 
   build-ios:
