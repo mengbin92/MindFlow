@@ -29,16 +29,16 @@ jobs:
           java-version: '17'
 
       - name: Install dependencies
-        run: cd packages/mobile && flutter pub get
+        run: flutter pub get
 
       - name: Build APK
-        run: cd packages/mobile && flutter build apk --release
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: packages/mobile/build/app/outputs/flutter-apk/*.apk
+          path: build/app/outputs/flutter-apk/*.apk
 
   release-web:
     name: Release Web
@@ -55,16 +55,16 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: cd packages/mobile && flutter pub get
+        run: flutter pub get
 
       - name: Build web
-        run: cd packages/mobile && flutter build web --release
+        run: flutter build web --release
 
       - name: Upload web build
         uses: actions/upload-artifact@v4
         with:
           name: web-dist
-          path: packages/mobile/build/web/
+          path: build/web/
 
   release-macos:
     name: Release macOS
@@ -84,16 +84,16 @@ jobs:
         run: flutter config --enable-macos-desktop
 
       - name: Install dependencies
-        run: cd packages/mobile && flutter pub get
+        run: flutter pub get
 
       - name: Build macOS
-        run: cd packages/mobile && flutter build macos --release
+        run: flutter build macos --release
 
       - name: Upload macOS build
         uses: actions/upload-artifact@v4
         with:
           name: macos-build
-          path: packages/mobile/build/macos/Build/Products/Release/*.app
+          path: build/macos/Build/Products/Release/*.app
 
   # ── Create GitHub Release ──────────────────────────────────────────
 

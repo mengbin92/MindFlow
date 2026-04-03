@@ -3,16 +3,8 @@ name: Flutter CI
 on:
   push:
     branches: [main, develop]
-    paths:
-      - 'packages/mobile/**'
   pull_request:
     branches: [main, develop]
-    paths:
-      - 'packages/mobile/**'
-
-defaults:
-  run:
-    working-directory: packages/mobile
 
 jobs:
   analyze:
@@ -61,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-coverage
-          path: packages/mobile/coverage/lcov.info
+          path: coverage/lcov.info
 
   build-web:
     name: Build Web
@@ -88,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: web-build
-          path: packages/mobile/build/web/
+          path: build/web/
 
   build-macos:
     name: Build macOS

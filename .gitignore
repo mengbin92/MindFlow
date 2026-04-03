@@ -1,28 +1,3 @@
-# ==================== Node / NPM ====================
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-package-lock.json
-yarn.lock
-.pnpm-store/
-dist/
-dist-ssr/
-*.local
-
-# ==================== Rust / Tauri ====================
-target/
-Cargo.lock
-**/*.rs.bk
-*.pdb
-*.dll
-*.dylib
-*.so
-# Tauri specific
-src-tauri/target/
-src-tauri/Cargo.lock
-
 # ==================== Flutter / Dart ====================
 **/dart_tool/
 **/android/**/gradle-wrapper.jar
@@ -67,7 +42,6 @@ Thumbs.db
 ehthumbs.db
 Thumbs.db
 Desktop.ini
-Desktop.ini
 
 # ==================== 环境变量 / 密钥 ====================
 .env
@@ -87,6 +61,9 @@ credentials.json
 *.dmg
 *.exe
 *.msi
+*.apk
+*.aab
+*.ipa
 
 # ==================== 日志 / 临时文件 ====================
 *.log
@@ -98,9 +75,3 @@ logs/
 # ==================== 测试覆盖率 ====================
 coverage/
 *.lcov
-.nyc_output/
-
-# ==================== 其他 ====================
-.prettierignore
-.eslintcache
-.turbo/
