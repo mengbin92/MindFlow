@@ -41,13 +41,13 @@ post_install do |installer|
     end
   end
 
-  # Patch all Pods xcconfig files to remove empty SWIFT_VERSION and set explicit 5.0
-  # This fixes CocoaPods error: "There may only be up to 1 unique SWIFT_VERSION per target"
+  # Remove SWIFT_VERSION from ALL Pods xcconfig files so Runner target
+  # only picks up SWIFT_VERSION from its own project build settings.
+  # This fixes the CocoaPods error "multiple SWIFT_VERSION per target"
+  # caused by different pods contributing conflicting Swift version values.
   Dir.glob(File.join(installer.sandbox_root, '**', '*.xcconfig')).each do |path|
     content = File.read(path)
-    # Remove all SWIFT_VERSION lines
     clean = content.lines.reject { |l| l =~ /\bSWIFT_VERSION\b/ }.join
-    # Append explicit SWIFT_VERSION
-    File.write(path, clean + "SWIFT_VERSION = 5.0;\n")
+    File.write(path, clean)
   end
 end
