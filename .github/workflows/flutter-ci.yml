@@ -161,14 +161,4 @@ jobs:
         run: flutter pub get
 
       - name: Build iOS (no codesign)
-        run: |
-          # Dump Generated.xcconfig before flutter build modifies/generates it
-          echo "=== Generated.xcconfig BEFORE flutter build ==="
-          cat ios/Flutter/Generated.xcconfig 2>/dev/null || echo "FILE NOT FOUND"
-          echo ""
-          echo "=== SWIFT_VERSION in project.pbxproj BEFORE ==="
-          grep "SWIFT_VERSION" ios/Runner.xcodeproj/project.pbxproj || echo "NONE FOUND"
-          echo ""
-          echo "=== baseConfigurationReference in project.pbxproj BEFORE ==="
-          grep "baseConfigurationReference" ios/Runner.xcodeproj/project.pbxproj || echo "NONE FOUND"
-          flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign

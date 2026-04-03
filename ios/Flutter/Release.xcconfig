@@ -1,2 +1,0 @@
-// Release.xcconfig for Runner — SWIFT_VERSION only, no includes to avoid inheriting empty values
-SWIFT_VERSION = 5.0;

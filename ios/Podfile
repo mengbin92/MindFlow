@@ -37,18 +37,6 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-      config.build_settings['SWIFT_VERSION'] = '5.0'
     end
-  end
-
-  # Ensure ALL xcconfig files have a consistent SWIFT_VERSION = 5.0.
-  # This prevents CocoaPods from finding "multiple SWIFT_VERSION per target" when
-  # Runner's target inherits from both Debug.xcconfig and Release.xcconfig
-  # (which define SWIFT_VERSION) and also from Generated.xcconfig.
-  Dir.glob(File.join(installer.sandbox_root, '**', '*.xcconfig')).each do |path|
-    lines = File.readlines(path)
-    # Remove existing SWIFT_VERSION lines
-    clean = lines.reject { |l| l =~ /\bSWIFT_VERSION\b/ }
-    File.write(path, clean.join + "SWIFT_VERSION = 5.0;\n")
   end
 end
