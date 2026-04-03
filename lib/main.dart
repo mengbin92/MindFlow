@@ -10,11 +10,14 @@ import 'domain/repositories/document_repository.dart';
 import 'domain/repositories/workspace_repository.dart';
 import 'repositories/file_repository.dart';
 import 'services/storage_service.dart';
+import 'services/hive_init.dart'
+    if (dart.library.html) 'services/hive_init_web.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
 
+  await initHive();
   final storageService = StorageService();
   await storageService.initialize();
 
