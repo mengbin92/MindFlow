@@ -40,14 +40,7 @@ post_install do |installer|
     end
   end
 
-  # Fix duplicate SWIFT_VERSION for all targets including Runner
-  installer.aggregate_targets.each do |aggregate_target|
-    aggregate_target.xcconfigs.each do |config_name, xcconfig|
-      xcconfig.other_flags.reject! { |flag| flag.include?('-fmodule-map') }
-      xcconfig.save_as(aggregate_target.xcconfig_path(config_name))
-    end
-  end
-
+  # Fix duplicate SWIFT_VERSION: set ALL targets to 5.0, removing empty-string settings
   installer.pods_project.build_configurations.each do |config|
     config.build_settings['SWIFT_VERSION'] = '5.0'
   end
@@ -59,5 +52,14 @@ post_install do |installer|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
       end
     end
+  end
+
+  # Fix SWIFT_VERSION in all xcconfig files to be explicit 5.0
+ Dir.glob(File.join(installer.sandbox_root, 'Pods', '**', '*.xcconfig')).each do |xcconfig_path|
+    content = File.read(xcconfig_path)
+    # Remove any empty or ambiguous SWIFT_VERSION
+    new_content = content.lines.reject { |line| line.strip.start_with?('SWIFT_VERSION') }.join
+    new_content += "\nSWIFT_VERSION = 5.0;\n"
+    File.write(xcconfig_path, new_content)
   end
 end
