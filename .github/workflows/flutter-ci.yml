@@ -85,7 +85,7 @@ jobs:
   build-macos:
     name: Build macOS
     runs-on: macos-latest
-    needs: test
+    needs: analyze
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -109,7 +109,7 @@ jobs:
   build-android:
     name: Build Android
     runs-on: ubuntu-latest
-    needs: test
+    needs: analyze
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -127,10 +127,12 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Install NDK
-        uses: android-ndk-org/setup-android-ndk@v3
-        with:
-          ndk-version: '27.0.12077973'
+      - name: Install NDK 27
+        run: |
+          mkdir -p $ANDROID_HOME/ndk
+          curl -sL https://dl.google.com/android/repository/android-ndk-r27b-linux.zip -o /tmp/ndk.zip
+          unzip -q /tmp/ndk.zip -d $ANDROID_HOME/ndk
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/android-ndk-r27b" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: flutter pub get
@@ -141,7 +143,7 @@ jobs:
   build-ios:
     name: Build iOS
     runs-on: macos-latest
-    needs: test
+    needs: analyze
     steps:
       - name: Checkout
         uses: actions/checkout@v4
