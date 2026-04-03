@@ -10,8 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### 重构
 
 - **Flutter 统一架构** - 将 Web/Desktop/Mobile 统一到 Flutter 单一代码库
+- **项目结构简化** - 移除旧的 TypeScript/React/Tauri 代码，专注于 Flutter
 - **BLoC 状态管理** - 使用 flutter_bloc 统一管理应用状态
-- **drift 替换 sqflite** - 更可维护的本地数据库方案
 - **平台适配层** - 抽象文件系统、导出、分享等平台差异
 
 ### 新增
@@ -26,14 +26,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - [平台] macOS 桌面端支持
 - [平台] Android/iOS/Web/macOS 四端支持
 - [工程] Flutter CI/CD (GitHub Actions)
-- [工程] 集成测试基础设施
-- [工程] 43 个单元测试全部通过
+- [工程] 自动构建 Android APK、iOS、macOS、Web
+- [工程] 自动发布到 GitHub Releases
+- [工程] 自动部署 Web 到 GitHub Pages
 
 ### 变更
 
 - 应用主入口从 React/TS 切换到 Flutter/Dart
-- 旧 Web (React+Vite) 和 Desktop (Tauri) 包进入维护模式
-- 编辑器采用 Bridge 策略，通过 WebView 桥接 CodeMirror 6
+- 移除 monorepo 结构，简化为单一 Flutter 项目
+- 编辑器采用 Bridge 策略，通过 WebView 桥接
+
+### 移除
+
+- 旧 React/TypeScript Web 端代码
+- 旧 Tauri 桌面端代码
+- Node.js 相关配置和依赖
 
 ## [1.0.0] - 2026-02-02
 
