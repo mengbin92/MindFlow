@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../blocs/file/file_bloc.dart';
@@ -219,6 +220,20 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
 
   void _shareDocument() {
     Share.share(_editorController.text, subject: _titleController.text);
+  }
+
+  void _startPresentation() {
+    final markdown = _editorController.text;
+    if (markdown.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('文档内容为空，无法启动演示')),
+      );
+      return;
+    }
+    context.push('/presentation', extra: {
+      'markdown': markdown,
+      'title': _titleController.text.trim(),
+    });
   }
 
   Future<void> _exportMarkdown() async {
@@ -474,6 +489,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
           onShare: _shareDocument,
           onExport: _showExportOptions,
           onSave: _saveDocument,
+          onPresent: _startPresentation,
         ),
         Expanded(
           child: TabBarView(
@@ -519,6 +535,7 @@ class _EditorHeader extends StatelessWidget {
   final VoidCallback onShare;
   final Future<void> Function() onExport;
   final Future<void> Function({bool showMessage}) onSave;
+  final VoidCallback onPresent;
 
   const _EditorHeader({
     required this.titleController,
@@ -529,6 +546,7 @@ class _EditorHeader extends StatelessWidget {
     required this.onShare,
     required this.onExport,
     required this.onSave,
+    required this.onPresent,
   });
 
   @override
@@ -580,6 +598,11 @@ class _EditorHeader extends StatelessWidget {
                   IconButton(
                     onPressed: () => onSave(),
                     icon: const Icon(Icons.save),
+                  ),
+                  IconButton(
+                    onPressed: onPresent,
+                    icon: const Icon(Icons.slideshow),
+                    tooltip: '演示模式',
                   ),
                 ],
               ),
