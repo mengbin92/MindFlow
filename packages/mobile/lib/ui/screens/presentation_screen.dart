@@ -28,7 +28,7 @@ class _PresentationScreenState extends State<PresentationScreen> {
   @override
   void initState() {
     super.initState();
-    final presentationService = const PresentationService();
+    const presentationService = PresentationService();
     final presentationHtml = presentationService.buildPresentationHtml(
       markdown: widget.markdown,
       theme: widget.theme,
@@ -62,7 +62,7 @@ class _PresentationScreenState extends State<PresentationScreen> {
       final result = await _webViewController.runJavaScriptReturningResult(
         'JSON.stringify({index: Reveal.getIndices().h, total: Reveal.getTotalSlides()})',
       );
-      final raw = result.stringPayload;
+      final raw = result.toString();
       // result is like {"index":0,"total":2}
       final indexMatch = RegExp(r'"index":(\d+)').firstMatch(raw);
       final totalMatch = RegExp(r'"total":(\d+)').firstMatch(raw);

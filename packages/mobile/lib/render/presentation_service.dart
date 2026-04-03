@@ -89,7 +89,7 @@ $slidesHtml
 
   List<_SlideContent> _splitSlides(String markdown) {
     if (markdown.trim().isEmpty) {
-      return [_SlideContent(html: '<p>无内容</p>')];
+      return [const _SlideContent(html: '<p>无内容</p>')];
     }
 
     final rawSlides = markdown.split(RegExp(r'\n---\n'));
