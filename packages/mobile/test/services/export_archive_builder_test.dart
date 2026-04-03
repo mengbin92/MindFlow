@@ -6,7 +6,7 @@ import 'package:mindflow/services/export_archive_builder.dart';
 
 void main() {
   test('builds a zip archive with ordered page png files', () {
-    final builder = ExportArchiveBuilder();
+    const builder = ExportArchiveBuilder();
 
     final zipBytes = builder.buildImagesZip(
       baseName: 'roadmap',
@@ -17,7 +17,8 @@ void main() {
     );
 
     final archive = ZipDecoder().decodeBytes(zipBytes);
-    final names = archive.files.map((file) => file.name).toList(growable: false);
+    final names =
+        archive.files.map((file) => file.name).toList(growable: false);
 
     expect(names, ['roadmap_001.png', 'roadmap_002.png']);
     expect(archive.files[0].content, [1, 2, 3]);

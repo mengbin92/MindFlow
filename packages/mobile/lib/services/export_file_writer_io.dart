@@ -43,10 +43,7 @@ class IoExportFileWriter implements ExportFileWriter {
     required String fileName,
     required String html,
   }) async {
-    final pdfBytes = await Printing.convertHtml(
-      html: html,
-      format: PdfPageFormat.a4,
-    );
+    final pdfBytes = await _renderHtmlToPdfBytes(html);
     return _writeBinaryFile(
       fileName: fileName,
       bytes: pdfBytes,
@@ -58,10 +55,7 @@ class IoExportFileWriter implements ExportFileWriter {
     required String fileName,
     required String html,
   }) async {
-    final pdfBytes = await Printing.convertHtml(
-      html: html,
-      format: PdfPageFormat.a4,
-    );
+    final pdfBytes = await _renderHtmlToPdfBytes(html);
     final firstPage = await Printing.raster(
       pdfBytes,
       pages: const [0],
@@ -80,10 +74,7 @@ class IoExportFileWriter implements ExportFileWriter {
     required String fileName,
     required String html,
   }) async {
-    final pdfBytes = await Printing.convertHtml(
-      html: html,
-      format: PdfPageFormat.a4,
-    );
+    final pdfBytes = await _renderHtmlToPdfBytes(html);
     final rasters = await Printing.raster(
       pdfBytes,
       dpi: 144,
@@ -133,6 +124,16 @@ class IoExportFileWriter implements ExportFileWriter {
     await file.writeAsBytes(bytes, flush: true);
 
     return filePath;
+  }
+
+  Future<Uint8List> _renderHtmlToPdfBytes(String html) async {
+    // `printing` still exposes HTML conversion through a deprecated entrypoint
+    // without an equivalent replacement API yet.
+    // ignore: deprecated_member_use
+    return Printing.convertHtml(
+      html: html,
+      format: PdfPageFormat.a4,
+    );
   }
 }
 

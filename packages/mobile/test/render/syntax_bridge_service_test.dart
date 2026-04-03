@@ -4,7 +4,7 @@ import 'package:mindflow/render/syntax_bridge_service.dart';
 void main() {
   group('SyntaxBridgeService', () {
     test('renders inline latex into bridge html', () async {
-      final service = LatexSyntaxBridgeService();
+      const service = LatexSyntaxBridgeService();
 
       final result = await service.render('Energy: \$E=mc^2\$');
 
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('renders block latex into bridge html', () async {
-      final service = LatexSyntaxBridgeService();
+      const service = LatexSyntaxBridgeService();
 
       final result = await service.render(r'''
 $$
@@ -30,7 +30,7 @@ $$
     });
 
     test('renders mermaid fenced block into bridge placeholder html', () async {
-      final service = LatexSyntaxBridgeService();
+      const service = LatexSyntaxBridgeService();
 
       final result = await service.render(
         '```mermaid\ngraph TD;\nA-->B;\n```',
@@ -46,7 +46,7 @@ $$
     });
 
     test('renders mermaid fenced block with dark theme metadata', () async {
-      final service = LatexSyntaxBridgeService();
+      const service = LatexSyntaxBridgeService();
 
       final result = await service.render(
         '```mermaid\ngraph TD;\nA-->B;\n```',

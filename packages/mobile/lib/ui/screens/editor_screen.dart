@@ -222,20 +222,22 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
   }
 
   Future<void> _exportMarkdown() async {
+    final documentRepository = context.read<DocumentRepository>();
+    final messenger = ScaffoldMessenger.of(context);
     try {
       if (_hasChanges) {
         await _saveDocument(showMessage: false);
       }
 
-      final exportPath = await context.read<DocumentRepository>().exportToMarkdown(
-            _document.id,
-          );
+      final exportPath = await documentRepository.exportToMarkdown(
+        _document.id,
+      );
 
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('已导出到 $exportPath'),
           duration: const Duration(seconds: 2),
@@ -245,7 +247,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('导出失败: $error'),
           duration: const Duration(seconds: 2),
@@ -255,6 +257,8 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
   }
 
   Future<void> _exportHtml() async {
+    final documentRepository = context.read<DocumentRepository>();
+    final messenger = ScaffoldMessenger.of(context);
     try {
       if (_hasChanges) {
         await _saveDocument(showMessage: false);
@@ -262,16 +266,16 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
 
       final htmlDocument = await _buildCurrentHtmlDocument();
 
-      final exportPath = await context.read<DocumentRepository>().exportToHtml(
-            _document.id,
-            html: htmlDocument,
-          );
+      final exportPath = await documentRepository.exportToHtml(
+        _document.id,
+        html: htmlDocument,
+      );
 
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('已导出到 $exportPath'),
           duration: const Duration(seconds: 2),
@@ -281,7 +285,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('导出失败: $error'),
           duration: const Duration(seconds: 2),
@@ -291,6 +295,8 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
   }
 
   Future<void> _exportPdf() async {
+    final documentRepository = context.read<DocumentRepository>();
+    final messenger = ScaffoldMessenger.of(context);
     try {
       if (_hasChanges) {
         await _saveDocument(showMessage: false);
@@ -298,16 +304,16 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
 
       final htmlDocument = await _buildCurrentHtmlDocument();
 
-      final exportPath = await context.read<DocumentRepository>().exportToPdf(
-            _document.id,
-            html: htmlDocument,
-          );
+      final exportPath = await documentRepository.exportToPdf(
+        _document.id,
+        html: htmlDocument,
+      );
 
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('已导出到 $exportPath'),
           duration: const Duration(seconds: 2),
@@ -317,7 +323,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('导出失败: $error'),
           duration: const Duration(seconds: 2),
@@ -327,6 +333,8 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
   }
 
   Future<void> _exportImage() async {
+    final documentRepository = context.read<DocumentRepository>();
+    final messenger = ScaffoldMessenger.of(context);
     try {
       if (_hasChanges) {
         await _saveDocument(showMessage: false);
@@ -334,16 +342,16 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
 
       final htmlDocument = await _buildCurrentHtmlDocument();
 
-      final exportPath = await context.read<DocumentRepository>().exportToImage(
-            _document.id,
-            html: htmlDocument,
-          );
+      final exportPath = await documentRepository.exportToImage(
+        _document.id,
+        html: htmlDocument,
+      );
 
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('已导出到 $exportPath'),
           duration: const Duration(seconds: 2),
@@ -353,7 +361,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('导出失败: $error'),
           duration: const Duration(seconds: 2),
@@ -363,6 +371,8 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
   }
 
   Future<void> _exportImagesZip() async {
+    final documentRepository = context.read<DocumentRepository>();
+    final messenger = ScaffoldMessenger.of(context);
     try {
       if (_hasChanges) {
         await _saveDocument(showMessage: false);
@@ -370,17 +380,16 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
 
       final htmlDocument = await _buildCurrentHtmlDocument();
 
-      final exportPath =
-          await context.read<DocumentRepository>().exportToImagesZip(
-                _document.id,
-                html: htmlDocument,
-              );
+      final exportPath = await documentRepository.exportToImagesZip(
+        _document.id,
+        html: htmlDocument,
+      );
 
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('已导出到 $exportPath'),
           duration: const Duration(seconds: 2),
@@ -390,7 +399,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text('导出失败: $error'),
           duration: const Duration(seconds: 2),
