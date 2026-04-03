@@ -4,14 +4,15 @@ abstract class SyntaxBridgeService {
   Future<SyntaxBridgeResult> render(String markdown, {bool isDarkMode = false});
 }
 
-class LatexSyntaxBridgeService implements SyntaxBridgeService {
-  const LatexSyntaxBridgeService();
+class CompositeSyntaxBridgeService implements SyntaxBridgeService {
+  const CompositeSyntaxBridgeService();
 
   @override
   Future<SyntaxBridgeResult> render(String markdown,
       {bool isDarkMode = false}) async {
     var html = markdown;
 
+    // Mermaid
     html = html.replaceAllMapped(
       RegExp(r'```mermaid\s*\n([\s\S]+?)```'),
       (match) {
@@ -21,11 +22,31 @@ class LatexSyntaxBridgeService implements SyntaxBridgeService {
       },
     );
 
+    // PlantUML (```plantuml or ```puml)
+    html = html.replaceAllMapped(
+      RegExp(r'```(?:plantuml|puml)\s*\n([\s\S]+?)```'),
+      (match) {
+        final code = _escapeHtml(match.group(1)?.trim() ?? '');
+        return '<pre class="mf-plantuml" data-plantuml-code="$code">$code</pre>';
+      },
+    );
+
+    // Markmap
+    html = html.replaceAllMapped(
+      RegExp(r'```markmap\s*\n([\s\S]+?)```'),
+      (match) {
+        final code = _escapeHtml(match.group(1)?.trim() ?? '');
+        return '<pre class="mf-markmap" data-markmap-code="$code">$code</pre>';
+      },
+    );
+
+    // Block LaTeX
     html = html.replaceAllMapped(RegExp(r'\$\$([\s\S]+?)\$\$'), (match) {
       final expression = _escapeHtml(match.group(1)?.trim() ?? '');
       return '<div class="mf-latex-block" data-latex="$expression">$expression</div>';
     });
 
+    // Inline LaTeX
     html = html.replaceAllMapped(RegExp(r'\$([^$\n]+?)\$'), (match) {
       final expression = _escapeHtml(match.group(1)?.trim() ?? '');
       return '<span class="mf-latex-inline" data-latex="$expression">$expression</span>';

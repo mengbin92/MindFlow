@@ -7,7 +7,7 @@ import 'syntax_bridge_service.dart';
 class PreviewRenderService {
   const PreviewRenderService({
     SyntaxBridgeService? syntaxBridgeService,
-  }) : syntaxBridgeService = syntaxBridgeService ?? const _DefaultLatexBridge();
+  }) : syntaxBridgeService = syntaxBridgeService ?? const _DefaultBridge();
 
   final SyntaxBridgeService? syntaxBridgeService;
 
@@ -212,6 +212,6 @@ $mermaidBootstrap
   }
 }
 
-class _DefaultLatexBridge extends LatexSyntaxBridgeService {
-  const _DefaultLatexBridge();
+class _DefaultBridge extends CompositeSyntaxBridgeService {
+  const _DefaultBridge();
 }
