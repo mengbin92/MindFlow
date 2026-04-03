@@ -89,6 +89,52 @@ class PreviewRenderService {
 '''
         : '';
 
+    final hasPlantuml = bodyHtml.contains('mf-plantuml');
+    final plantumlBootstrap = hasPlantuml
+        ? '''
+  <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder@1.4.0/dist/plantuml-encoder.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.mf-plantuml').forEach((element) => {
+        const code = element.getAttribute('data-plantuml-code') ?? '';
+        try {
+          const encoded = plantumlEncoder.encode(code);
+          element.outerHTML = '<img src="https://www.plantuml.com/plantuml/svg/' + encoded + '" alt="PlantUML Diagram" style="max-width:100%">';
+        } catch (error) {
+          element.outerHTML = '<div class="mf-plantuml-error">' + String(error) + '</div>';
+        }
+      });
+    });
+  </script>
+'''
+        : '';
+
+    final hasMarkmap = bodyHtml.contains('mf-markmap');
+    final markmapBootstrap = hasMarkmap
+        ? '''
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.15.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.15.4/dist/browser/index.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.mf-markmap').forEach((element, index) => {
+        const code = element.getAttribute('data-markmap-code') ?? '';
+        try {
+          const { Transformer } = window.markmap;
+          const transformer = new Transformer();
+          const { root } = transformer.transform(code);
+          const id = 'mf-markmap-svg-' + index;
+          element.outerHTML = '<div id="' + id + '" style="width:100%;min-height:300px"><svg style="width:100%;height:100%"></svg></div>';
+          Markmap.create('#' + id + ' svg', null, root);
+        } catch (error) {
+          element.outerHTML = '<div class="mf-markmap-error">' + String(error) + '</div>';
+        }
+      });
+    });
+  </script>
+'''
+        : '';
+
     return '''
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -191,7 +237,7 @@ class PreviewRenderService {
       background: #f7f2e7;
     }
   </style>
-$mermaidBootstrap
+$mermaidBootstrap$plantumlBootstrap$markmapBootstrap
 </head>
 <body>
   <main class="mf-document">

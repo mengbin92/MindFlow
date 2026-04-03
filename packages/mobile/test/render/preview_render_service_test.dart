@@ -82,5 +82,55 @@ void main() {
       expect(document, contains('querySelectorAll(\'.mf-mermaid\')'));
       expect(document, contains('data-mermaid-theme'));
     });
+
+    test('buildHtmlDocument includes plantuml CDN when mf-plantuml present', () {
+      const service = PreviewRenderService();
+      final html = service.buildHtmlDocument(
+        title: 'Test',
+        bodyHtml: '<pre class="mf-plantuml" data-plantuml-code="test">test</pre>',
+      );
+
+      expect(html, contains('plantuml-encoder'));
+      expect(html, contains('plantuml.com'));
+    });
+
+    test('buildHtmlDocument includes markmap CDN when mf-markmap present', () {
+      const service = PreviewRenderService();
+      final html = service.buildHtmlDocument(
+        title: 'Test',
+        bodyHtml: '<pre class="mf-markmap" data-markmap-code="# Root"># Root</pre>',
+      );
+
+      expect(html, contains('markmap'));
+      expect(html, contains('d3'));
+    });
+
+    test('buildHtmlDocument omits all CDN when no extensions present', () {
+      const service = PreviewRenderService();
+      final html = service.buildHtmlDocument(
+        title: 'Test',
+        bodyHtml: '<p>Hello world</p>',
+      );
+
+      expect(html, isNot(contains('mermaid')));
+      expect(html, isNot(contains('plantuml-encoder')));
+      expect(html, isNot(contains('markmap')));
+    });
+
+    test('buildHtmlDocument includes all CDN when all extensions present', () {
+      const service = PreviewRenderService();
+      final html = service.buildHtmlDocument(
+        title: 'Test',
+        bodyHtml: '''
+<pre class="mf-mermaid">graph TD;</pre>
+<pre class="mf-plantuml" data-plantuml-code="test">test</pre>
+<pre class="mf-markmap" data-markmap-code="# Root"># Root</pre>
+''',
+      );
+
+      expect(html, contains('mermaid'));
+      expect(html, contains('plantuml-encoder'));
+      expect(html, contains('markmap'));
+    });
   });
 }
