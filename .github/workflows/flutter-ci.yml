@@ -160,5 +160,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Debug: show Generated.xcconfig
+        run: cat ios/Flutter/Generated.xcconfig
+
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign
