@@ -39,4 +39,14 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
     end
   end
+
+  # Workaround for CocoaPods "multiple SWIFT_VERSION per target" error.
+  # This replaces ALL occurrences of 'SWIFT_VERSION = ;' (empty) in all Pods
+  # xcconfig files with 'SWIFT_VERSION = 5.0;'
+  Dir.glob(File.join(installer.sandbox_root, '**', '*.xcconfig')).each do |xcconfig|
+    content = File.read(xcconfig)
+    if content.include?('SWIFT_VERSION = ;')
+      File.write(xcconfig, content.gsub('SWIFT_VERSION = ;', 'SWIFT_VERSION = 5.0;'))
+    end
+  end
 end
