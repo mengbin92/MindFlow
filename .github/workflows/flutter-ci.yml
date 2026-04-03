@@ -129,16 +129,17 @@ jobs:
 
       - name: Install NDK 27
         run: |
-          mkdir -p $ANDROID_HOME/ndk
+          mkdir -p /usr/local/lib/android/sdk/ndk
           curl -sL https://dl.google.com/android/repository/android-ndk-r27b-linux.zip -o /tmp/ndk.zip
-          unzip -q /tmp/ndk.zip -d $ANDROID_HOME/ndk
+          unzip -q /tmp/ndk.zip -d /usr/local/lib/android/sdk/ndk
+          echo "/usr/local/lib/android/sdk/ndk/android-ndk-r27b" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Android APK
         env:
-          ANDROID_NDK_HOME: $ANDROID_HOME/ndk/android-ndk-r27b
+          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/android-ndk-r27b
         run: flutter build apk --debug
 
   build-ios:
