@@ -25,20 +25,6 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
-# pre_install runs BEFORE CocoaPods analyzes targets.
-# Use it to fix empty SWIFT_VERSION in Pods xcconfig files before they're inspected.
-pre_install do |installer|
-  puts \"Patching Pods xcconfig files for SWIFT_VERSION...\"
-  Dir.glob(File.join(installer.sandbox_root, '**', '*.xcconfig')).each do |xcconfig|
-    content = File.read(xcconfig)
-    # Replace empty SWIFT_VERSION with 5.0
-    if content.include?('SWIFT_VERSION = ;')
-      File.write(xcconfig, content.gsub('SWIFT_VERSION = ;', 'SWIFT_VERSION = 5.0;'))
-      puts \"  Patched: #{xcconfig}\"
-    end
-  end
-end
-
 target 'Runner' do
   use_frameworks!
   use_modular_headers!

@@ -1,3 +1,0 @@
-// Debug.xcconfig for Runner
-#include "Generated.xcconfig"
-SWIFT_VERSION = 5.0;
