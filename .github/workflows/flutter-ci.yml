@@ -161,9 +161,4 @@ jobs:
         run: flutter pub get
 
       - name: Build iOS (simulator, no codesign)
-        run: |
-          # Run pod install separately with verbose output to capture the Swift conflict source
-          cd ios
-          pod install --verbose 2>&1 | tee /tmp/pod_verbose.log
-          echo "=== POD INSTALL OUTPUT ==="
-          cat /tmp/pod_verbose.log | grep -E '(SWIFT_VERSION|Swift|multiple)' | head -20
+        run: flutter build ios --simulator --no-codesign
