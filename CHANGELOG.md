@@ -1,190 +1,53 @@
-# 更新日志
+# Changelog
 
-所有版本更新记录均在此文件中。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/).
+
+## [2.0.0] - 2026-04-03
+
+### 重构
+
+- **Flutter 统一架构** - 将 Web/Desktop/Mobile 统一到 Flutter 单一代码库
+- **BLoC 状态管理** - 使用 flutter_bloc 统一管理应用状态
+- **drift 替换 sqflite** - 更可维护的本地数据库方案
+- **平台适配层** - 抽象文件系统、导出、分享等平台差异
+
+### 新增
+
+- [渲染] PlantUML 图表支持（```plantuml / ```puml 语法）
+- [渲染] Markmap 思维导图支持（```markmap 语法）
+- [渲染] LaTeX 公式桥接（行内 $...$ 和块级 $$...$$）
+- [渲染] Mermaid 图表桥接
+- [演示] reveal.js 全屏演示模式，支持主题/过渡/演讲者备注
+- [导出] HTML/PDF/PNG/JPEG/Markdown 导出
+- [导出] 多页图片 ZIP 导出
+- [平台] macOS 桌面端支持
+- [平台] Android/iOS/Web/macOS 四端支持
+- [工程] Flutter CI/CD (GitHub Actions)
+- [工程] 集成测试基础设施
+- [工程] 43 个单元测试全部通过
+
+### 变更
+
+- 应用主入口从 React/TS 切换到 Flutter/Dart
+- 旧 Web (React+Vite) 和 Desktop (Tauri) 包进入维护模式
+- 编辑器采用 Bridge 策略，通过 WebView 桥接 CodeMirror 6
 
 ## [1.0.0] - 2026-02-02
 
 ### 新增
 
-- 正式发布 v1.0.0 版本
-- 完成完整文档体系（用户文档、开发文档、API 文档）
-- 新增 GitHub Issue 模板和 Pull Request 模板
-- 新增贡献指南 (CONTRIBUTING.md)
-
-### 变更
-
-- 更新 README.md，包含完整的项目介绍和下载链接
-- 优化项目结构，整理文档目录
-
----
-
-## [0.9.0] - 2026-01-30
-
-### 新增
-
-- 移动端 Flutter 应用完整功能
-- iOS 和 Android 双平台支持
-- 移动端文件管理功能
-- 移动端编辑器适配
-- 手势操作支持
-
----
-
-## [0.8.0] - 2026-01-28
-
-### 新增
-
-- Web 端正式部署上线
-- 域名配置: https://md.mengbin.top
-- Nginx 配置优化（HTTPS、Gzip、缓存）
-- Docker 多阶段构建配置
-- 自动化部署脚本
-
-### 优化
-
-- Web 端代码分割优化（vendor 分离）
-- 生产环境构建优化
-- 资源分类输出
-
----
-
-## [0.7.0] - 2026-01-25
-
-### 新增
-
-- 完整的主题系统（深色/浅色/自动）
-- FiraCode 字体集成
-- 配置管理模块
-- 配置 UI 界面
-- 配置导入/导出功能
-- 设置持久化
-
-### 优化
-
-- 编辑器主题同步
-- 预览主题同步
-
----
-
-## [0.6.0] - 2026-01-22
-
-### 新增
-
-- 完整的导出功能（HTML、PDF、PNG、JPEG）
-- 演示模式（基于 reveal.js）
-- 导出菜单 UI 组件
-- 演示模式 UI 组件
-- 导出选项配置
-
-### 优化
-
-- PDF 导出样式优化
-- 演示模式过渡动画
-
----
-
-## [0.5.0] - 2026-01-18
-
-### 新增
-
-- LaTeX 公式支持（KaTeX）
-- Mermaid 图表支持
-- Markmap 思维导图支持
-- PlantUML 集成
-- 扩展语法解析器
-- 懒加载优化
-
-### 优化
-
-- 渲染性能优化
-- 大文件懒加载
-
----
-
-## [0.4.0] - 2026-01-15
-
-### 新增
-
-- 完整的文件管理系统
-- 文件树组件
-- 文件列表组件
-- 文件监听（notify）
-- 文件增删改查
-- 文件搜索功能
-- 最近文件列表
-- 文件夹折叠/展开
-
-### 优化
-
-- 文件操作性能
-- 大文件夹加载优化
-
----
-
-## [0.3.0] - 2026-01-12
-
-### 新增
-
-- CodeMirror 6 集成
-- 基础 Markdown 语法支持
-- 语法高亮（Shiki）
-- 实时预览渲染
-- 所见即所得模式
-- 快捷键系统
-- 自动保存
-- 撤销/重做
-
-### 优化
-
-- 编辑器响应速度
-- 预览渲染性能
-
----
-
-## [0.2.0] - 2026-01-08
-
-### 新增
-
-- Tauri 窗口管理
-- 系统托盘功能
-- 全局快捷键（Cmd/Ctrl+Shift+M）
-- 文件关联支持
-- 文件拖放打开
-- 应用图标和打包
-- 自动更新功能
-
-### 优化
-
-- 窗口状态持久化
-- 应用启动速度
-
----
-
-## [0.1.0] - 2026-01-05
-
-### 新增
-
-- 项目初始化（Monorepo）
-- Tauri 桌面端脚手架
-- Web 端脚手架搭建
-- CI/CD 流程搭建（GitHub Actions）
-- 代码规范配置（ESLint/Prettier）
-- Git 工作流规范文档
-- 基础 UI 组件
-
-### 项目结构
-
-```
-MindFlow/
-├── packages/
-│   ├── desktop/          # Tauri 桌面端
-│   ├── web/              # Web 端
-│   ├── mobile/           # 移动端 (Flutter)
-│   └── shared/           # 共享代码
-├── docs/                 # 文档
-├── scripts/              # 脚本工具
-└── .github/workflows/    # CI/CD 配置
-```
+- React + TypeScript Web 端完整实现
+- Tauri v2 桌面端 (macOS/Windows/Linux)
+- CodeMirror 6 编辑器集成
+- LaTeX (KaTeX)、Mermaid、PlantUML、Markmap 扩展语法
+- HTML/PDF/PNG/JPEG 导出
+- reveal.js 演示模式
+- 深色/浅色主题
+- 文件树、文件列表、三栏布局
+- Flutter Mobile 雏形
 
 ---
 
@@ -197,36 +60,3 @@ MindFlow/
 - **主版本号**：不兼容的 API 修改
 - **次版本号**：向下兼容的功能性新增
 - **修订号**：向下兼容的问题修正
-
-### 版本标签
-
-- `[新增]` - 新功能
-- `[修复]` - Bug 修复
-- `[变更]` - 功能变更
-- `[优化]` - 性能优化
-- `[安全]` - 安全相关
-- `[移除]` - 移除功能
-
----
-
-## 计划中的功能
-
-### v1.1.0 (计划中)
-
-- [ ] 插件系统
-- [ ] 自定义主题
-- [ ] 云同步支持
-- [ ] 协作编辑
-
-### v1.2.0 (计划中)
-
-- [ ] Vim 模式
-- [ ] Emacs 模式
-- [ ] 更多导出格式
-- [ ] 版本历史
-
----
-
-## 反馈
-
-如果你发现任何问题或有新功能建议，请在 [GitHub Issues](https://github.com/yourusername/mindflow/issues) 提交。

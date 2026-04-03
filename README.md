@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  一款极简风格的开源 Markdown 编辑器，致力于提供流畅的写作体验
+  一款极简风格的开源 Markdown 编辑器，基于 Flutter 构建跨平台体验
 </p>
 
 <p align="center">
@@ -15,16 +15,11 @@
   <a href="LICENSE">
     <img src="https://img.shields.io/github/license/yourusername/mindflow?style=flat-square" alt="License">
   </a>
-  <a href="https://md.mengbin.top">
-    <img src="https://img.shields.io/badge/Web-在线体验-blue?style=flat-square" alt="Web">
-  </a>
 </p>
 
 <p align="center">
-  <a href="https://md.mengbin.top">在线体验</a> •
   <a href="#安装">下载安装</a> •
-  <a href="docs/用户文档.md">使用文档</a> •
-  <a href="docs/项目概览.md">开发文档</a> •
+  <a href="docs/Flutter重构技术方案.md">技术方案</a> •
   <a href="CHANGELOG.md">更新日志</a>
 </p>
 
@@ -34,175 +29,124 @@
 
 ### 核心功能
 
-- **极简设计** - 类似 Typora 的简洁界面，三栏布局（文件夹 + 文件列表 + 编辑器）
-- **纯本地使用** - 无需联网，数据完全本地存储，全方位保障隐私
-- **高性能** - 轻量架构，针对多文件和大文件场景优化，启动迅速，响应流畅
-- **所见即所得** - 实时预览，支持语法高亮、自动排版
+- **极简设计** - 类似 Typora 的简洁界面，三栏自适应布局
+- **纯本地使用** - 无需联网，数据完全本地存储，保障隐私
+- **跨平台** - 基于 Flutter，支持 Android、iOS、Web、macOS
+- **实时预览** - 编辑与预览模式切换，所见即所得
 
-### 扩展支持
+### 扩展语法
 
-- **LaTeX 公式** - 基于 KaTeX，支持行内公式 `$...$` 和块级公式 `$$...$$`
-- **Mermaid 图表** - 支持流程图、时序图、类图、甘特图等多种图表
-- **PlantUML** - 专业 UML 图表支持
-- **Markmap 思维导图** - 将 Markdown 转为交互式思维导图
+- **LaTeX 公式** - 支持行内 `$...$` 和块级 `$$...$$` 公式
+- **Mermaid 图表** - 流程图、时序图、类图、甘特图等
+- **PlantUML** - 专业 UML 图表支持（通过在线服务渲染）
+- **Markmap 思维导图** - Markdown 转交互式思维导图
 
 ### 导出与演示
 
-- **多格式导出** - 支持 HTML、PDF、PNG、JPEG 导出
-- **演示模式** - 基于 reveal.js 的 PPT 模式，支持演讲和分享
+- **多格式导出** - HTML、PDF、Markdown、PNG、JPEG
+- **多页图片 ZIP** - 多页文档导出为分页图片压缩包
+- **演示模式** - 基于 reveal.js 的全屏 PPT 模式
 
 ### 主题与配置
 
 - **深色/浅色主题** - 一键切换，自动适配系统主题
-- **FiraCode 字体** - 中文默认使用 FiraCode，等宽显示更舒适
-- **自定义配置** - 丰富的配置项，支持导入/导出
+- **工作区模式** - 支持本地文件夹工作区和 App 内资料库
+- **国际化** - 中文/英文支持
 
 ## 安装
+
+### 移动端
+
+| 平台 | 下载链接 | 系统要求 |
+|------|----------|----------|
+| Android | [mindflow.apk](https://github.com/yourusername/mindflow/releases/latest) | Android 5.0+ |
+| iOS | App Store（敬请期待） | iOS 14+ |
 
 ### 桌面端
 
 | 平台 | 下载链接 | 系统要求 |
 |------|----------|----------|
-| macOS | [mindflow-macos.dmg](https://github.com/yourusername/mindflow/releases/latest) | macOS 10.15+ |
-| Windows | [mindflow-windows.exe](https://github.com/yourusername/mindflow/releases/latest) | Windows 10+ |
-| Linux | [mindflow-linux.AppImage](https://github.com/yourusername/mindflow/releases/latest) | Ubuntu 20.04+ |
+| macOS | [mindflow-macos.dmg](https://github.com/yourusername/mindflow/releases/latest) | macOS 12+ |
 
-### Web 端
+### Web
 
-直接访问 [https://md.mengbin.top](https://md.mengbin.top) 即可使用。
+在线体验：[md.mengbin.top](https://md.mengbin.top)
 
-### 移动端
+## 技术栈
 
-| 平台 | 下载链接 |
-|------|----------|
-| iOS | [App Store](https://apps.apple.com) |
-| Android | [Google Play](https://play.google.com) / [APK](https://github.com/yourusername/mindflow/releases/latest) |
+| 层级 | 技术 |
+|------|------|
+| UI 框架 | Flutter 3.29+ |
+| 状态管理 | flutter_bloc (BLoC/Cubit) |
+| 路由 | go_router |
+| 本地存储 | sqflite / shared_preferences |
+| Markdown | markdown + flutter_markdown |
+| 主题 | flex_color_scheme + dynamic_color |
+| 导出 | pdf + printing |
+| 演示 | reveal.js (WebView) |
+| CI/CD | GitHub Actions |
 
-## 快速开始
-
-### 基础使用
-
-1. **打开文件夹** - 使用 `Cmd/Ctrl + O` 打开本地文件夹
-2. **创建文件** - 点击侧边栏的 "+" 按钮或按 `Cmd/Ctrl + N`
-3. **编辑内容** - 在编辑器中输入 Markdown 内容，右侧实时预览
-4. **保存文件** - 按 `Cmd/Ctrl + S` 保存
-
-### 常用快捷键
-
-| 快捷键 | 功能 |
-|--------|------|
-| `Cmd/Ctrl + N` | 新建文件 |
-| `Cmd/Ctrl + O` | 打开文件夹 |
-| `Cmd/Ctrl + S` | 保存文件 |
-| `Cmd/Ctrl + Shift + E` | 导出文件 |
-| `Cmd/Ctrl + Shift + P` | 演示模式 |
-| `Cmd/Ctrl + Shift + M` | 切换预览模式 |
-| `Cmd/Ctrl + B` | 切换侧边栏 |
-| `Cmd/Ctrl + Shift + F` | 搜索文件 |
-
-更多快捷键请参考 [用户文档](docs/用户文档.md)。
-
-## 截图预览
-
-<p align="center">
-  <img src="docs/images/screenshot-editor.png" alt="编辑器界面" width="80%">
-</p>
-
-<p align="center">
-  <img src="docs/images/screenshot-mermaid.png" alt="Mermaid 图表" width="80%">
-</p>
-
-## 开发
-
-### 环境要求
-
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- Rust >= 1.70.0 (桌面端开发)
-
-### 安装依赖
-
-```bash
-npm install
-```
-
-### 开发命令
-
-```bash
-# 启动桌面端开发服务器
-npm run desktop:dev
-
-# 启动 Web 端开发服务器
-npm run web:dev
-
-# 构建所有包
-npm run build
-
-# 运行测试
-npm run test
-
-# 代码检查
-npm run lint
-
-# 代码格式化
-npm run format
-```
-
-### 项目结构
+## 项目结构
 
 ```
 MindFlow/
 ├── packages/
-│   ├── desktop/          # Tauri 桌面端
-│   ├── web/              # Web 端
-│   ├── mobile/           # Flutter 移动端
-│   └── shared/           # 共享代码
-├── docs/                 # 文档
-├── scripts/              # 脚本工具
-└── .github/workflows/    # CI/CD 配置
+│   └── mobile/                  # Flutter 主应用（Android/iOS/Web/macOS）
+│       ├── lib/
+│       │   ├── app/             # 应用外壳、路由、BlocObserver
+│       │   ├── blocs/           # BLoC 状态管理
+│       │   ├── domain/          # 领域模型与仓储接口
+│       │   ├── editor/          # 编辑器桥接层
+│       │   ├── models/          # 数据模型
+│       │   ├── platform/        # 平台适配（文件系统）
+│       │   ├── render/          # 预览渲染与扩展语法桥接
+│       │   ├── repositories/    # 仓储实现
+│       │   ├── services/        # 服务层（存储、导出）
+│       │   └── ui/              # UI 层（页面、组件、主题）
+│       ├── test/                # 单元测试与 Widget 测试
+│       └── integration_test/    # 集成测试
+├── docs/                        # 文档
+│   └── Flutter重构技术方案.md    # 重构方案
+└── .github/workflows/           # CI/CD
+    ├── flutter-ci.yml           # Flutter CI（analyze/test/build）
+    ├── ci.yml                   # 旧包 CI（维护模式）
+    └── release.yml              # 发布工作流
 ```
 
-详细开发文档请参考 [项目概览](docs/项目概览.md)。
+## 开发
 
-## 技术栈
+### 前提条件
 
-- **前端框架**: React 18 + TypeScript
-- **桌面端**: Tauri v2 + Rust
-- **Web 端**: Vite + React
-- **移动端**: Flutter
-- **编辑器**: CodeMirror 6
-- **状态管理**: Redux Toolkit
-- **构建工具**: Turbo (Monorepo)
+- Flutter SDK 3.29+
+- Dart SDK 3.0+
+- Android Studio / Xcode
 
-## 贡献
+### 快速开始
 
-欢迎贡献代码、报告问题或提出建议！
+```bash
+cd packages/mobile
+flutter pub get
+flutter run
+```
 
-1. Fork 本仓库
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'feat: add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+### 运行测试
 
-请参考 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详细的贡献指南。
+```bash
+cd packages/mobile
+flutter test              # 单元测试
+flutter analyze           # 静态分析
+flutter test integration_test/  # 集成测试
+```
+
+### 构建
+
+```bash
+flutter build apk --release       # Android
+flutter build ios --release       # iOS
+flutter build web --release       # Web
+flutter build macos --release     # macOS
+```
 
 ## 许可证
 
-[MIT License](LICENSE) © 2026 孟斯特
-
-## 致谢
-
-感谢以下开源项目的支持：
-
-- [CodeMirror 6](https://codemirror.net/) - 编辑器核心
-- [Tauri](https://tauri.app/) - 桌面端框架
-- [React](https://react.dev/) - UI 框架
-- [reveal.js](https://revealjs.com/) - 演示模式
-- [KaTeX](https://katex.org/) - LaTeX 渲染
-- [Mermaid](https://mermaid.js.org/) - 图表渲染
-
----
-
-<p align="center">
-  Made with ❤️ by 孟斯特
-</p>
+MIT License

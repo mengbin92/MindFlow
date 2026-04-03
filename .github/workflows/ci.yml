@@ -7,8 +7,12 @@ on:
     branches: [main, develop]
 
 jobs:
-  lint:
-    name: Lint
+  # Flutter CI is handled by flutter-ci.yml
+  # This workflow covers the legacy Node.js packages (web, desktop, core)
+  # which are in maintenance mode.
+
+  legacy-lint:
+    name: Legacy Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,8 +29,8 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-  format:
-    name: Format Check
+  legacy-format:
+    name: Legacy Format Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -42,50 +46,3 @@ jobs:
 
       - name: Check format
         run: npm run format -- --check
-
-  build:
-    name: Build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build packages
-        run: npm run build
-
-  test-desktop:
-    name: Test Desktop
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build desktop
-        run: cd packages/desktop && npm run build
