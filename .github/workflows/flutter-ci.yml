@@ -119,7 +119,6 @@ jobs:
         with:
           flutter-version: '3.32.0'
           channel: 'stable'
-          ndk-version: '27.0.12077973'
           cache: false
 
       - name: Setup Java
@@ -127,6 +126,11 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+
+      - name: Install NDK
+        uses: android-ndk-org/setup-android-ndk@v3
+        with:
+          ndk-version: '27.0.12077973'
 
       - name: Install dependencies
         run: flutter pub get
