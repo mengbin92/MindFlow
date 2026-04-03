@@ -161,7 +161,15 @@ jobs:
         run: flutter pub get
 
       - name: Debug: show Generated.xcconfig
-        run: cat ios/Flutter/Generated.xcconfig
+        run: |
+          echo "=== Generated.xcconfig ==="
+          cat ios/Flutter/Generated.xcconfig
+          echo ""
+          echo "=== project.pbxproj SWIFT_VERSION ==="
+          grep "SWIFT_VERSION" ios/Runner.xcodeproj/project.pbxproj || echo "NONE"
+          echo ""
+          echo "=== project.pbxproj baseConfigurationReference ==="
+          grep "baseConfigurationReference" ios/Runner.xcodeproj/project.pbxproj || echo "NONE"
 
-      - name: Build iOS (no codesign)
-        run: flutter build ios --release --no-codesign
+      - name: Build iOS (simulator, no codesign)
+        run: flutter build ios --simulator --no-codesign
