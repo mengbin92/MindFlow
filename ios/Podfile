@@ -37,29 +37,17 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
     end
   end
 
-  # Fix duplicate SWIFT_VERSION: set ALL targets to 5.0, removing empty-string settings
-  installer.pods_project.build_configurations.each do |config|
-    config.build_settings['SWIFT_VERSION'] = '5.0'
-  end
-
-  installer.generated_projects.each do |project|
-    project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['SWIFT_VERSION'] = '5.0'
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-      end
-    end
-  end
-
-  # Fix SWIFT_VERSION in all xcconfig files to be explicit 5.0
- Dir.glob(File.join(installer.sandbox_root, 'Pods', '**', '*.xcconfig')).each do |xcconfig_path|
-    content = File.read(xcconfig_path)
-    # Remove any empty or ambiguous SWIFT_VERSION
-    new_content = content.lines.reject { |line| line.strip.start_with?('SWIFT_VERSION') }.join
-    new_content += "\nSWIFT_VERSION = 5.0;\n"
-    File.write(xcconfig_path, new_content)
+  # Patch all Pods xcconfig files to remove empty SWIFT_VERSION and set explicit 5.0
+  # This fixes CocoaPods error: "There may only be up to 1 unique SWIFT_VERSION per target"
+  Dir.glob(File.join(installer.sandbox_root, '**', '*.xcconfig')).each do |path|
+    content = File.read(path)
+    # Remove all SWIFT_VERSION lines
+    clean = content.lines.reject { |l| l =~ /\bSWIFT_VERSION\b/ }.join
+    # Append explicit SWIFT_VERSION
+    File.write(path, clean + "SWIFT_VERSION = 5.0;\n")
   end
 end
