@@ -119,6 +119,7 @@ jobs:
         with:
           flutter-version: '3.32.0'
           channel: 'stable'
+          ndk-version: '27.0.12077973'
           cache: false
 
       - name: Setup Java
