@@ -22,6 +22,7 @@ class ExportArchiveBuilder {
       );
     }
 
-    return Uint8List.fromList(ZipEncoder().encode(archive) ?? const <int>[]);
+    final encoded = ZipEncoder().encode(archive);
+    return Uint8List.fromList(encoded);
   }
 }

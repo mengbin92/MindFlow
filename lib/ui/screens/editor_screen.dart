@@ -219,7 +219,7 @@ class _DocumentEditorViewState extends State<DocumentEditorView>
   }
 
   void _shareDocument() {
-    Share.share(_editorController.text, subject: _titleController.text);
+    SharePlus.instance.share(ShareParams(text: _editorController.text, subject: _titleController.text));
   }
 
   void _startPresentation() {
