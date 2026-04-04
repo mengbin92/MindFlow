@@ -1,6 +1,7 @@
 import '../domain/models/workspace_descriptor.dart';
 import 'workspace_file_system_stub.dart'
-    if (dart.library.io) 'workspace_file_system_io.dart';
+    if (dart.library.io) 'workspace_file_system_io.dart'
+    if (dart.library.js_interop) 'workspace_file_system_web.dart';
 
 class WorkspaceEntry {
   final String path;
