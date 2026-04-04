@@ -75,4 +75,4 @@ logs/
 # ==================== 测试覆盖率 ====================
 coverage/
 *.lcov
-.dart_tool/
+.dart_tool/.worktrees/
