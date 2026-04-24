@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'
+          channel: 'stable'
+      - run: flutter pub get
+        working-directory: apps/mindflow_flutter
+      - name: Build Web
+        run: flutter build web --release
+        working-directory: apps/mindflow_flutter
+      - name: Upload Web Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: apps/mindflow_flutter/build/web
+      - name: Build macOS
+        run: flutter build macos
+        working-directory: apps/mindflow_flutter
+      - name: Build iOS
+        run: flutter build ios
+        working-directory: apps/mindflow_flutter

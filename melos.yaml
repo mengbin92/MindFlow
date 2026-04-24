@@ -1,0 +1,46 @@
+name: mindflow
+repository: https://github.com/mengbin92/mindflow
+
+packages:
+  - apps/**
+  - packages/**
+
+scripts:
+  bootstrap:
+    exec: flutter pub get
+    stage: pre
+
+  analyze:
+    exec: flutter analyze
+    packageFilters:
+      - mindflow_*
+
+  test:
+    exec: flutter test
+    packageFilters:
+      - mindflow_*
+
+  build:
+    exec: flutter build web --release
+    packageFilters:
+      - mindflow_flutter
+
+  format:
+    exec: dart format .
+    packageFilters:
+      - mindflow_*
+
+  build:ios:
+    exec: flutter build ios --simulator --no-codesign
+    packageFilters:
+      - mindflow_flutter
+
+  build:android:
+    exec: flutter build apk --debug
+    packageFilters:
+      - mindflow_flutter
+
+  build:macos:
+    exec: flutter build macos
+    packageFilters:
+      - mindflow_flutter

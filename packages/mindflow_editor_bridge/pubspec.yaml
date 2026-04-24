@@ -1,0 +1,17 @@
+name: mindflow_editor_bridge
+description: MindFlow editor bridge layer (CodeMirror integration)
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  equatable: ^2.0.5
+  web: ^1.1.0
+  webview_flutter: ^4.10.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
