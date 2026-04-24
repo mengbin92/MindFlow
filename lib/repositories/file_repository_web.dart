@@ -8,8 +8,8 @@ import '../domain/repositories/document_repository.dart';
 import '../domain/repositories/workspace_repository.dart';
 import '../models/document.dart';
 import '../platform/workspace_file_system.dart';
-import '../services/export_file_writer.dart';
-import '../services/storage_service.dart';
+import 'package:mindflow_export/mindflow_export.dart';
+import 'package:mindflow_storage/mindflow_storage.dart';
 
 class FileRepository implements DocumentRepository, WorkspaceRepository {
   final StorageService storageService;

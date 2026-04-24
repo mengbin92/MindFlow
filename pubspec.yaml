@@ -53,6 +53,12 @@ dependencies:
   url_launcher: ^6.3.0
   webview_flutter: ^4.10.0
 
+  # MindFlow packages
+  mindflow_export:
+    path: packages/mindflow_export
+  mindflow_storage:
+    path: packages/mindflow_storage
+
   # Theme
   dynamic_color: ^1.8.0
   flex_color_scheme: ^8.0.0

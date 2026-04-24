@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mindflow_storage/mindflow_storage.dart';
+import 'repositories/file_repository.dart';
+
 import 'application/workspace/workspace_service.dart';
 import 'app/app.dart';
 import 'app/app_bloc_observer.dart';
@@ -8,10 +11,6 @@ import 'blocs/file/file_bloc.dart';
 import 'blocs/settings/settings_bloc.dart';
 import 'domain/repositories/document_repository.dart';
 import 'domain/repositories/workspace_repository.dart';
-import 'repositories/file_repository.dart';
-import 'services/storage_service.dart';
-import 'services/hive_init.dart'
-    if (dart.library.html) 'services/hive_init_web.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

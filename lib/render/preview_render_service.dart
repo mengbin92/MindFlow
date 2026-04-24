@@ -65,6 +65,34 @@ class PreviewRenderService {
     required String bodyHtml,
   }) {
     final safeTitle = _escapeHtml(title.isEmpty ? 'Untitled' : title);
+    final hasLatex = bodyHtml.contains('mf-latex');
+    final latexBootstrap = hasLatex
+        ? '''
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.mf-latex-inline').forEach((element) => {
+        const latex = element.getAttribute('data-latex') ?? '';
+        try {
+          katex.render(latex, element, { throwOnError: false, displayMode: false });
+        } catch (error) {
+          element.textContent = latex;
+        }
+      });
+      document.querySelectorAll('.mf-latex-block').forEach((element) => {
+        const latex = element.getAttribute('data-latex') ?? '';
+        try {
+          katex.render(latex, element, { throwOnError: false, displayMode: true });
+        } catch (error) {
+          element.textContent = latex;
+        }
+      });
+    });
+  </script>
+'''
+        : '';
+
     final hasMermaid = bodyHtml.contains('mf-mermaid');
     final mermaidBootstrap = hasMermaid
         ? '''
@@ -237,7 +265,7 @@ class PreviewRenderService {
       background: #f7f2e7;
     }
   </style>
-$mermaidBootstrap$plantumlBootstrap$markmapBootstrap
+$latexBootstrap$mermaidBootstrap$plantumlBootstrap$markmapBootstrap
 </head>
 <body>
   <main class="mf-document">

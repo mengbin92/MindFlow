@@ -9,7 +9,7 @@ import '../../domain/models/workspace_snapshot.dart';
 import '../../domain/repositories/document_repository.dart';
 import '../../domain/repositories/workspace_repository.dart';
 import '../../models/document.dart';
-import '../../services/storage_service.dart';
+import 'package:mindflow_storage/mindflow_storage.dart';
 
 part 'file_event.dart';
 part 'file_state.dart';

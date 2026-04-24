@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../models/app_settings.dart';
-import '../../services/storage_service.dart';
+import 'package:mindflow_storage/mindflow_storage.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';
