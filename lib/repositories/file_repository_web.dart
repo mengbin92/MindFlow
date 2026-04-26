@@ -21,7 +21,7 @@ class FileRepository implements DocumentRepository, WorkspaceRepository {
     required this.storageService,
     ExportFileWriter? exportFileWriter,
     WorkspaceFileSystem? workspaceFileSystem,
-  })  : exportFileWriter = exportFileWriter ?? createExportFileWriter(),
+  })  : exportFileWriter = exportFileWriter ?? createExportFileWriterImpl(),
         workspaceFileSystem =
             workspaceFileSystem ?? createWorkspaceFileSystem();
 

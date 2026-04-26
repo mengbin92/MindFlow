@@ -6,6 +6,7 @@ import 'package:printing/printing.dart';
 import 'package:web/web.dart' as web;
 
 import 'export_archive_builder.dart';
+import 'export_file_writer_base.dart';
 export 'export_archive_builder.dart';
 export 'export_file_writer_base.dart';
 

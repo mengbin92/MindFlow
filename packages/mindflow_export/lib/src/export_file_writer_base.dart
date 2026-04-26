@@ -27,6 +27,3 @@ abstract class ExportFileWriter {
     required String html,
   });
 }
-
-/// Creates the platform-appropriate [ExportFileWriter] instance.
-ExportFileWriter createExportFileWriter() => createExportFileWriterImpl();
