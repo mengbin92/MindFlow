@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MindFlow E2E Test</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f1e8;
+      --surface: #fffdf8;
+      --text: #1f2328;
+      --muted: #5f6b76;
+      --border: #ded6c4;
+      --code-bg: #f1ebdd;
+      --accent: #9f5b2d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 32px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(159, 91, 45, 0.12), transparent 36%),
+        linear-gradient(180deg, var(--bg) 0%, #efe7d8 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .document {
+      width: min(860px, 100%);
+      margin: 0 auto;
+      padding: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(79, 55, 33, 0.12);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      line-height: 1.2;
+      margin-top: 1.6em;
+      margin-bottom: 0.6em;
+    }
+
+    h1 { font-size: 2rem; margin-top: 0; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+
+    p, ul, ol, blockquote, pre, table {
+      margin: 0 0 1rem;
+    }
+
+    a { color: var(--accent); }
+
+    blockquote {
+      margin-left: 0;
+      padding: 12px 16px;
+      border-left: 4px solid var(--accent);
+      background: rgba(159, 91, 45, 0.08);
+      color: var(--muted);
+    }
+
+    code {
+      padding: 0.15em 0.35em;
+      border-radius: 6px;
+      background: var(--code-bg);
+      font-family: "SFMono-Regular", "Menlo", monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+    }
+
+    pre code {
+      padding: 0;
+      background: transparent;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background: #f7f2e7;
+    }
+
+    ul ul, ol ol, ul ol, ol ul {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="document">
+    <h1 id="mindflow-">MindFlow 端到端渲染测试</h1>
+<h2 id="1-">1. 标题层级测试</h2>
+<h3 id="11-">1.1 二级标题</h3>
+<h4 id="111-">1.1.1 三级标题</h4>
+<h5 id="1111-">1.1.1.1 四级标题</h5>
+<h2 id="2-">2. 文本格式化</h2>
+<p>这是<strong>粗体文本</strong>，这是<em>斜体文本</em>，这是<del>删除线文本</del>。</p>
+<p>混合使用：<strong>粗体 + <em>斜体</em></strong>，以及<em><strong>粗斜体</strong></em>。</p>
+<h2 id="3-">3. 链接与图片</h2>
+<p><a href="https://mindflow.app">访问 MindFlow 官网</a></p>
+<h2 id="4-">4. 列表</h2>
+<h3 id="41-">4.1 有序列表</h3>
+<ol>
+<li>第一项</li>
+<li>第二项</li>
+<li>第三项
+<ul>
+<li>无序子项 A</li>
+<li>无序子项 B
+<ul>
+<li>深嵌套项</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="42-">4.2 任务列表</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked="true"></input>已完成任务</li>
+<li class="task-list-item"><input type="checkbox"></input>待完成任务</li>
+<li class="task-list-item"><input type="checkbox"></input>另一个待办</li>
+</ul>
+<h2 id="5-">5. 代码</h2>
+<h3 id="51-">5.1 行内代码</h3>
+<p>使用 <code>dart</code> 语言：<code>final value = 42;</code></p>
+<h3 id="52-">5.2 代码块</h3>
+<pre><code class="language-python">def fibonacci(n):
+    &quot;&quot;&quot;Calculate Fibonacci number.&quot;&quot;&quot;
+    if n &lt;= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# Print first 10 numbers
+for i in range(10):
+    print(fibonacci(i))
+</code></pre>
+<h2 id="6-">6. 表格</h2>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th align="center">Web</th>
+<th align="center">iOS</th>
+<th align="center">Android</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>编辑器</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr>
+<tr>
+<td>预览</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr>
+<tr>
+<td>导出 PDF</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr>
+<tr>
+<td>LaTeX</td>
+<td align="center">✅</td>
+<td align="center">⚠️</td>
+<td align="center">⚠️</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-">7. 引用</h2>
+<blockquote>
+<p>简单引用</p>
+<blockquote>
+<p>嵌套引用</p>
+<blockquote>
+<p>多层嵌套</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<h2 id="8-">8. 分割线</h2>
+<p>上面内容</p>
+<hr />
+<p>下面内容</p>
+<h2 id="9-html-">9. HTML 特殊元素测试</h2>
+<p>使用 <code>&lt;mark&gt;</code> 高亮文本，使用 <code>&lt;kbd&gt;</code> 快捷键：<code>Ctrl + S</code></p>
+<hr />
+<p><strong>测试完成时间</strong>: 2026-04-26T11:24:27.968970</p>
+
+  </main>
+</body>
+</html>
